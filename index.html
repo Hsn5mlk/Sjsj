@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بطولة الكنز الملكي - النظام المتكامل</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style>
+        :root {
+            --bg-dark: #0f172a; --card-dark: #1e293b; --gold: #fbbf24;
+            --blue: #3b82f6; --green: #22c55e; --red: #ef4444; --text: #f8fafc;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text); overflow-x: hidden; }
+        header { background: rgba(30, 41, 59, 0.95); padding: 15px 5%; position: fixed; top: 0; width: 100%; z-index: 1000; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); }
+        .container { max-width: 1000px; margin: 120px auto 40px; padding: 0 20px; }
+        
+        .setup-card { background: var(--card-dark); padding: 30px; border-radius: 20px; border: 1px solid var(--gold); text-align: center; }
+        .grid-select { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
+        label { display: block; margin-bottom: 10px; color: var(--gold); font-weight: bold; }
+        select, .btn-main { width: 100%; padding: 15px; border-radius: 12px; border: none; font-size: 16px; font-weight: bold; }
+        select { background: #334155; color: white; }
+        .btn-main { background: linear-gradient(135deg, var(--gold), #d97706); color: #000; cursor: pointer; transition: 0.3s; }
+        .btn-main:hover { transform: scale(1.03); }
+        .btn-red { background: linear-gradient(135deg, var(--red), #991b1b); }
+        .btn-blue { background: linear-gradient(135deg, var(--blue), #1d4ed8); }
+
+        #lobbyView { display: none; text-align: center; }
+        .players-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 15px; margin: 25px 0; background: rgba(0,0,0,0.3); padding: 20px; border-radius: 15px; }
+        .p-box { text-align: center; position: relative; padding: 10px; border-radius: 10px; }
+        .p-box img { width: 70px; height: 70px; border-radius: 50%; border: 3px solid var(--green); }
+        .p-box.eliminated img { border-color: var(--red); opacity: 0.5; }
+        .status-on { position: absolute; bottom: 35px; right: 25px; width: 15px; height: 15px; background: var(--green); border-radius: 50%; border: 2px solid var(--card-dark); }
+
+        #gameArena { display: none; }
+        .stats-bar { display: flex; justify-content: space-around; background: var(--card-dark); padding: 15px; border-radius: 15px; margin-bottom: 20px; border-bottom: 4px solid var(--gold); }
+        .p-stat { text-align: center; }
+        .p-stat img { width: 50px; height: 50px; border-radius: 50%; }
+        .score { font-size: 22px; font-weight: 900; color: var(--gold); }
+        
+        .turn-box { text-align: center; padding: 10px; border-radius: 10px; margin-bottom: 15px; font-weight: bold; }
+        .q-card { background: var(--card-dark); padding: 25px; border-radius: 20px; text-align: center; position: relative; }
+        .timer-bg { width: 100%; height: 8px; background: #334155; border-radius: 4px; margin: 15px 0; overflow: hidden; }
+        .timer-fill { width: 100%; height: 100%; background: var(--gold); transition: 1s linear; }
+        
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+        .opt-btn { padding: 15px; background: #334155; color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; cursor: pointer; transition: 0.2s; }
+        .opt-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .opt-btn:hover:not(:disabled) { background: var(--blue); }
+
+        #authModal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 9999; }
+        
+        .category-tag {
+            display: inline-block;
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-bottom: 10px;
+            border: 1px solid #3b82f6;
+        }
+        
+        .time-warning { color: #fbbf24; font-weight: bold; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        
+        .action-buttons { display: flex; gap: 15px; justify-content: center; margin-top: 20px; }
+        .action-buttons button { flex: 1; max-width: 200px; }
+        
+        .withdraw-modal {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+        }
+        
+        /* الأنماط الجديدة */
+        .leaderboard-btn {
+            background: none;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 1px 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 1px;
+        }
+        
+        .leaderboard-modal {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+        }
+        
+        .leaderboard-container {
+            background: var(--card-dark);
+            padding: 3px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            transition: 0.3s;
+        }
+        
+        .leaderboard-item:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateX(-5px);
+        }
+        
+        .leaderboard-rank {
+            width: 50px;
+            text-align: center;
+            font-size: 8px;
+            font-weight: bold;
+            color: var(--gold);
+        }
+        
+        .leaderboard-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-left: 15px;
+            border: 3px solid var(--gold);
+        }
+        
+        .leaderboard-info {
+            flex: 1;
+        }
+        
+        .leaderboard-name {
+            font-weight: bold;
+            font-size: 8px;
+        }
+        
+        .leaderboard-stats {
+            display: flex;
+            gap: 2px;
+            margin-top: 5px;
+        }
+        
+        .leaderboard-stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .trophy-icon {
+            color: var(--gold);
+            margin-right: 5px;
+        }
+        
+        .leaderboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--gold);
+        }
+        
+        .user-trophy {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(251, 191, 36, 0.2);
+            padding: 3px 10px;
+            border-radius: 15px;
+            margin-right: 10px;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div id="uInfo">
+            <div class="user-profile">
+                <img id="uAvatar" class="user-avatar" src="" style="display:none;">
+                <span id="uGems">0</span> <i class="fas fa-gem" style="color:var(--gold)"></i>
+                <span id="uWins" class="user-trophy" style="display:none">
+                    <i class="fas fa-trophy trophy-icon"></i>
+                    <span id="uWinsCount">0</span>
+                </span>
+            </div>
+        </div>
+        <div style="font-weight: 900; color: var(--gold); letter-spacing: 1px;"></div>
+        <div class="nav-buttons">
+            <button class="leaderboard-btn" onclick="showLeaderboard()">
+                <i class="fas fa-crown"></i> قائمة الأبطال
+            </button>
+            <button id="loginBtn" onclick="document.getElementById('authModal').style.display='flex'" style="background:none; border:1px solid var(--gold); color:var(--gold); padding:5px 15px; border-radius:5px; cursor:pointer;">دخول</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div id="setupView" class="animate__animated animate__fadeIn">
+            <div class="setup-card">
+                <i class="fas fa-crown fa-4x" style="color:var(--gold); margin-bottom:15px;"></i>
+                <h2>إعداد فانوس التحدي العشوائي🩸</h2>
+                <div class="grid-select">
+                    <div>
+                        <label>عدد اللاعبين</label>
+                        <select id="selPlayers">
+                            <option value="2">2 لاعبين</option>
+                            
+                        </select>
+                    </div>
+                    <div>
+                        <label>قيمة الجواهر</label>
+                        <select id="selFee">
+                            <option value="5000">5,000</option>
+                            <option value="10000">10,000</option>
+                            <option value="50000">50,000</option>
+                            <option value="250000">250,000</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn-main" onclick="joinMatch()">البحث عن منافسين ⚔️</button>
+            </div>
+        </div>
+
+        <div id="lobbyView">
+            <h2 id="lobbyStatus">جاري البحث عن غرفة...</h2>
+            <div id="playersGrid" class="players-grid"></div>
+            <div class="action-buttons">
+                <button class="btn-main btn-red" onclick="showWithdrawModal()">الانسحاب</button>
+            </div>
+            <div class="animate__animated animate__pulse animate__infinite">
+                <i class="fas fa-shield-alt fa-3x" style="color:var(--gold)"></i>
+            </div>
+            <p id="lobbyTimer" style="color:var(--gold); margin-top:10px; font-weight:bold;"></p>
+        </div>
+
+        <div id="gameArena">
+            <div class="stats-bar">
+                <div class="p-stat">
+                    <img id="p1Img" src="">
+                    <div class="score" id="p1Score">0</div>
+                    <small id="p1Name">أنا</small>
+                </div>
+                <div style="align-self:center; font-weight:bold; color:var(--gold)">VS</div>
+                <div class="p-stat">
+                    <img id="p2Img" src="">
+                    <div class="score" id="p2Score">0</div>
+                    <small id="p2Name">الخصم</small>
+                </div>
+            </div>
+            <div id="turnTag" class="turn-box">المباراة جارية...</div>
+            <div class="q-card">
+                <div id="categoryTag" class="category-tag">عام</div>
+                <div class="timer-bg"><div id="timerBar" class="timer-fill"></div></div>
+                <p id="timerText" class="time-warning">الوقت المتبقي: 30 ثانية</p>
+                <p id="qCount" style="color:var(--gold); font-weight:bold;">السؤال 1 / 10</p>
+                <h2 id="qText" style="margin:15px 0;">...</h2>
+                <div id="optionsGrid" class="options-grid"></div>
+                <div class="action-buttons">
+                    <button class="btn-main btn-red" onclick="showWithdrawModal()">الانسحاب</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="authModal" class="auth-modal">
+        <div style="background:var(--card-dark); padding:30px; border-radius:20px; width:90%; max-width:400px; text-align:center;">
+            <h3 style="margin-bottom:15px;">تسجيل الدخول</h3>
+            <input type="email" id="email" placeholder="البريد الإلكتروني" style="width:100%; padding:12px; margin-bottom:10px; border-radius:8px; border:none;">
+            <input type="password" id="pass" placeholder="كلمة المرور" style="width:100%; padding:12px; margin-bottom:10px; border-radius:8px; border:none;">
+            <button class="btn-main" onclick="handleAuth()">دخول</button>
+        </div>
+    </div>
+
+    <div id="withdrawModal" class="withdraw-modal">
+        <div style="background:var(--card-dark); padding:30px; border-radius:20px; width:90%; max-width:400px; text-align:center;">
+            <i class="fas fa-exclamation-triangle fa-3x" style="color:var(--gold); margin-bottom:15px;"></i>
+            <h3 style="margin-bottom:15px;">تأكيد الانسحاب</h3>
+            <p id="withdrawMessage" style="margin-bottom:20px;">
+                هل تريد الانسحاب من البطولة؟<br>
+                سيتم استرداد <span id="refundAmount" style="color:var(--gold); font-weight:bold;">0</span> جوهرة بعد خصم 1% رسوم إدارية
+            </p>
+            <div style="display:flex; gap:10px;">
+                <button class="btn-main btn-red" onclick="confirmWithdraw()" style="flex:1;">نعم، انسحاب</button>
+                <button class="btn-main" onclick="closeWithdrawModal()" style="flex:1;">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="leaderboardModal" class="leaderboard-modal">
+        <div class="leaderboard-container">
+            <div class="leaderboard-header">
+                <h2><i class="fas fa-crown trophy-icon"></i> </h2>
+                <button class="btn-main" onclick="closeLeaderboard()" style="padding: 8px 20px;">إغلاق</button>
+            </div>
+            <div id="leaderboardList">
+                <!-- سيتم ملؤها ديناميكياً -->
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+        import { getFirestore, doc, getDoc, updateDoc, onSnapshot, collection, query, where, getDocs, addDoc, arrayUnion, increment, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDYKCCTcurNcJslrNKqdiJCoIIK-YZArB4",
+            authDomain: "sbaq-fc46f.firebaseapp.com",
+            projectId: "sbaq-fc46f",
+            storageBucket: "sbaq-fc46f.firebasestorage.app",
+            appId: "1:1026865750415:web:0ee39a717bcafaa0d06bfa"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+    window.alert = function(msg) {
+    // حذف كل شيء وإظهار رسالة ثابتة
+    const modal = document.createElement('div');
+    modal.style = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display:flex; justify-content:center; align-items:center; z-index:99999;';
+    modal.innerHTML = `
+        <div style="background:#1e293b; padding:30px; border-radius:20px; border:2px solid #fbbf24; max-width:400px; text-align:center;">
+            <h3 style="color:#fbbf24; margin-bottom:15px;">💎 إشعار النظام</h3>
+            <p style="color:white; font-size:18px; margin-bottom:25px;">تمت العملية بنجاح</p>
+            <button onclick="this.parentElement.parentElement.remove()" style="background:#fbbf24; color:black; border:none; padding:12px 30px; border-radius:10px; font-weight:bold; cursor:pointer;">موافق</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+};
+        let user, userData, roomId, timerInt, lobbyTimerInt, currentRoomData;
+        const ADMIN_EMAIL = "hsn5@H.com";
+
+        // قائمة الأسئلة الموسعة (1000+ سؤال)
+        const questions = [
+            {
+                category: "العلوم والتكنولوجيا",
+                questions: [
+                    { q: "ما هو أسرع كوكب يدور حول الشمس؟", o: [{t:"عطارد", p:100}, {t:"الزهرة", p:40}, {t:"المريخ", p:20}, {t:"الأرض", p:10}, {t:"المشتري", p:5}, {t:"زحل", p:0}] },
+                    { q: "من هو مكتشف قانون الجاذبية؟", o: [{t:"نيوتن", p:100}, {t:"أينشتاين", p:50}, {t:"جاليلو", p:30}, {t:"تسلا", p:10}, {t:"إديسون", p:5}, {t:"دا فينشي", p:0}] },
+                    { q: "ما هي وحدة قياس التيار الكهربائي؟", o: [{t:"الأمبير", p:100}, {t:"الفولت", p:40}, {t:"الأوم", p:20}, {t:"الواط", p:10}, {t:"الجول", p:5}, {t:"الكولوم", p:0}] },
+                    { q: "ما هو الغاز الأكثر وفرة في الغلاف الجوي للأرض؟", o: [{t:"النيتروجين", p:100}, {t:"الأكسجين", p:40}, {t:"ثاني أكسيد الكربون", p:20}, {t:"الهيليوم", p:10}, {t:"الأرجون", p:5}, {t:"الهيدروجين", p:0}] },
+                    { q: "ما هو المعدن الأفضل في التوصيل الكهربائي؟", o: [{t:"الفضة", p:100}, {t:"النحاس", p:40}, {t:"الذهب", p:20}, {t:"الألمنيوم", p:10}, {t:"الحديد", p:5}, {t:"الزنك", p:0}] },
+                    { q: "ما هو أصغر كوكب في المجموعة الشمسية؟", o: [{t:"عطارد", p:100}, {t:"الزهرة", p:40}, {t:"المريخ", p:20}, {t:"الأرض", p:10}, {t:"الزئبق", p:5}, {t:"بلوتو", p:0}] },
+                    { q: "ما هو أطول نهر في العالم؟", o: [{t:"نهر النيل", p:100}, {t:"نهر الأمازون", p:40}, {t:"نهر المسيسيبي", p:20}, {t:"نهر اليانغتسي", p:10}, {t:"نهر الفولجا", p:5}, {t:"نهر الدانوب", p:0}] },
+                    { q: "كم عدد العظام في جسم الإنسان البالغ؟", o: [{t:"206", p:100}, {t:"200", p:40}, {t:"210", p:20}, {t:"196", p:10}, {t:"220", p:5}, {t:"180", p:0}] },
+                    { q: "ما هو العنصر الكيميائي الذي رمزه 'O'؟", o: [{t:"الأكسجين", p:100}, {t:"الذهب", p:40}, {t:"الفضة", p:20}, {t:"الحديد", p:10}, {t:"الكربون", p:5}, {t:"الهيدروجين", p:0}] },
+                    { q: "ما هو الجهاز الذي يحول الطاقة الميكانيكية إلى طاقة كهربائية؟", o: [{t:"المولد الكهربائي", p:100}, {t:"المحرك الكهربائي", p:40}, {t:"المحول الكهربائي", p:20}, {t:"المكثف الكهربائي", p:10}, {t:"المقاومة الكهربائية", p:5}, {t:"الديود", p:0}] },
+                    { q: "ما هو أصل كلمة 'روبوت'؟", o: [{t:"تشيكي", p:100}, {t:"إنجليزي", p:40}, {t:"ياباني", p:20}, {t:"ألماني", p:10}, {t:"فرنسي", p:5}, {t:"روسي", p:0}] },
+                    { q: "ما هي أسرع حيوان بري في العالم؟", o: [{t:"الفهد", p:100}, {t:"الأسد", p:40}, {t:"النمر", p:20}, {t:"الحصان", p:10}, {t:"الغزال", p:5}, {t:"الكنغر", p:0}] },
+                    { q: "ما هو أكبر حيوان في العالم؟", o: [{t:"الحوت الأزرق", p:100}, {t:"الفيل", p:40}, {t:"الزرافة", p:20}, {t:"الحوت القاتل", p:10}, {t:"الديناصور", p:5}, {t:"القرش", p:0}] },
+                    { q: "ما هو أعمق محيط في العالم؟", o: [{t:"المحيط الهادئ", p:100}, {t:"المحيط الأطلسي", p:40}, {t:"المحيط الهندي", p:20}, {t:"المحيط المتجمد الشمالي", p:10}, {t:"المحيط المتجمد الجنوبي", p:5}, {t:"البحر الأبيض المتوسط", p:0}] },
+                    { q: "ما هو أقرب نجم إلى الأرض بعد الشمس؟", o: [{t:"بروكسيما سنتوري", p:100}, {t:"سيريوس", p:40}, {t:"النسر الواقع", p:20}, {t:"رجل القنطور", p:10}, {t:"الدبران", p:5}, {t:"الشعرى", p:0}] },
+                    { q: "ما هو العنصر الكيميائي الذي رمزه 'Na'؟", o: [{t:"الصوديوم", p:100}, {t:"النيكل", p:40}, {t:"النتروجين", p:20}, {t:"النيون", p:10}, {t:"النحاس", p:5}, {t:"النوبليوم", p:0}] },
+                    { q: "ما هو الجهاز الذي يستخدم لقياس سرعة الرياح؟", o: [{t:"الأنيمومتر", p:100}, {t:"البارومتر", p:40}, {t:"الترمومتر", p:20}, {t:"الهيجرومتر", p:10}, {t:"المرقاب", p:5}, {t:"السيكرومتر", p:0}] },
+                    { q: "ما هو أصل النفط؟", o: [{t:"الكائنات البحرية المتحللة", p:100}, {t:"الصخور البركانية", p:40}, {t:"النباتات الأرضية", p:20}, {t:"الغازات الطبيعية", p:10}, {t:"الفحم الحجري", p:5}, {t:"المياه الجوفية", p:0}] },
+                    { q: "ما هو العنصر الكيميائي الذي رمزه 'Fe'؟", o: [{t:"الحديد", p:100}, {t:"الفضة", p:40}, {t:"الفوسفور", p:20}, {t:"الفلور", p:10}, {t:"الفرانسيوم", p:5}, {t:"الفاناديوم", p:0}] },
+                    { q: "ما هي المادة التي تسمى 'الذهب السائل'؟", o: [{t:"العسل", p:100}, {t:"النفط", p:40}, {t:"الزيتون", p:20}, {t:"القهوة", p:10}, {t:"الشاي", p:5}, {t:"الزعفران", p:0}] },
+                    { q: "ما هو الجهاز الذي يحول الطاقة الكهربائية إلى طاقة ميكانيكية؟", o: [{t:"المحرك الكهربائي", p:100}, {t:"المولد الكهربائي", p:40}, {t:"المحول الكهربائي", p:20}, {t:"المكثف الكهربائي", p:10}, {t:"المقاومة الكهربائية", p:5}, {t:"الملف الكهربائي", p:0}] },
+                    { q: "ما هو أقدم علم في العالم؟", o: [{t:"علم الفلك", p:100}, {t:"علم الطب", p:40}, {t:"علم الرياضيات", p:20}, {t:"علم الفيزياء", p:10}, {t:"علم الكيمياء", p:5}, {t:"علم الأحياء", p:0}] },
+                    { q: "ما هو الغاز الذي يشكل حوالي 78% من الغلاف الجوي؟", o: [{t:"النيتروجين", p:100}, {t:"الأكسجين", p:40}, {t:"ثاني أكسيد الكربون", p:20}, {t:"الهيدروجين", p:10}, {t:"الهيليوم", p:5}, {t:"الأرجون", p:0}] },
+                    { q: "ما هو العنصر الكيميائي الذي رمزه 'K'؟", o: [{t:"البوتاسيوم", p:100}, {t:"الكالسيوم", p:40}, {t:"الكربون", p:20}, {t:"الكبريت", p:10}, {t:"الكلور", p:5}, {t:"الكريبتون", p:0}] },
+                    { q: "ما هو الجهاز الذي يستخدم لقياس الضغط الجوي؟", o: [{t:"البارومتر", p:100}, {t:"الترمومتر", p:40}, {t:"الأنيمومتر", p:20}, {t:"الهيجرومتر", p:10}, {t:"المرقاب", p:5}, {t:"المقياس", p:0}] },
+                    { q: "ما هو المعدن الذي يوجد في حالة سائلة في درجة حرارة الغرفة؟", o: [{t:"الزئبق", p:100}, {t:"الصوديوم", p:40}, {t:"البوتاسيوم", p:20}, {t:"الذهب", p:10}, {t:"الفضة", p:5}, {t:"النحاس", p:0}] },
+                    { q: "ما هو أصل كلمة 'كمبيوتر'؟", o: [{t:"لاتيني", p:100}, {t:"إنجليزي", p:40}, {t:"يوناني", p:20}, {t:"فرنسي", p:10}, {t:"ألماني", p:5}, {t:"عربي", p:0}] },
+                    { q: "ما هو الجهاز الذي يستخدم لقياس الرطوبة في الجو؟", o: [{t:"الهيجرومتر", p:100}, {t:"البارومتر", p:40}, {t:"الترمومتر", p:20}, {t:"الأنيمومتر", p:10}, {t:"المرقاب", p:5}, {t:"المقياس", p:0}] },
+                    { q: "ما هو العنصر الكيميائي الذي رمزه 'Ag'؟", o: [{t:"الفضة", p:100}, {t:"الذهب", p:40}, {t:"الألومنيوم", p:20}, {t:"الأرجون", p:10}, {t:"الأنتيمون", p:5}, {t:"الأستاتين", p:0}] },
+                    { q: "ما هو أصل كلمة 'هندسة'؟", o: [{t:"فارسي", p:100}, {t:"عربي", p:40}, {t:"يوناني", p:20}, {t:"لاتيني", p:10}, {t:"هندي", p:5}, {t:"صيني", p:0}] }
+                ]
+            },
+            {
+                category: "التاريخ والحضارات",
+                questions: [
+                    { q: "ما هي عاصمة الدولة العباسية في أوج ازدهارها؟", o: [{t:"بغداد", p:100}, {t:"دمشق", p:40}, {t:"القاهرة", p:20}, {t:"الكوفة", p:10}, {t:"سامراء", p:5}, {t:"البصرة", p:0}] },
+                    { q: "من هو أول خليفة في الدولة الإسلامية؟", o: [{t:"أبو بكر الصديق", p:100}, {t:"عمر بن الخطاب", p:40}, {t:"عثمان بن عفان", p:20}, {t:"علي بن أبي طالب", p:10}, {t:"معاوية بن أبي سفيان", p:5}, {t:"الحسن بن علي", p:0}] },
+                    { q: "في أي عام وقعت معركة بلاط الشهداء؟", o: [{t:"732 م", p:100}, {t:"711 م", p:40}, {t:"750 م", p:20}, {t:"800 م", p:10}, {t:"850 م", p:5}, {t:"900 م", p:0}] },
+                    { q: "من هو مؤسس الدولة الأموية؟", o: [{t:"معاوية بن أبي سفيان", p:100}, {t:"عبد الملك بن مروان", p:40}, {t:"الوليد بن عبد الملك", p:20}, {t:"هشام بن عبد الملك", p:10}, {t:"يزيد بن معاوية", p:5}, {t:"مروان بن الحكم", p:0}] },
+                    { q: "ما هي المعركة التي سماها المسلمون فتح الفتوح؟", o: [{t:"معركة نهاوند", p:100}, {t:"معركة اليرموك", p:40}, {t:"معركة القادسية", p:20}, {t:"معركة حطين", p:10}, {t:"معركة عين جالوت", p:5}, {t:"معركة وادي لكة", p:0}] },
+                    { q: "من هو الخليفة العباسي الذي أسس بيت الحكمة؟", o: [{t:"هارون الرشيد", p:100}, {t:"المأمون", p:40}, {t:"المعتصم", p:20}, {t:"الواثق", p:10}, {t:"المتوكل", p:5}, {t:"المنصور", p:0}] },
+                    { q: "في أي عام سقطت غرناطة آخر معاقل المسلمين في الأندلس؟", o: [{t:"1492 م", p:100}, {t:"1453 م", p:40}, {t:"1500 م", p:20}, {t:"1400 م", p:10}, {t:"1485 م", p:5}, {t:"1510 م", p:0}] },
+                    { q: "من هو القائد المسلم الذي فتح بلاد السند؟", o: [{t:"محمد بن القاسم الثقفي", p:100}, {t:"قتيبة بن مسلم", p:40}, {t:"موسى بن نصير", p:20}, {t:"طارق بن زياد", p:10}, {t:"عقبة بن نافع", p:5}, {t:"أسامة بن زيد", p:0}] },
+                    { q: "ما هي الدولة التي حكمها صلاح الدين الأيوبي؟", o: [{t:"مصر والشام", p:100}, {t:"المغرب العربي", p:40}, {t:"العراق وفارس", p:20}, {t:"الجزيرة العربية", p:10}, {t:"الأندلس", p:5}, {t:"الأناضول", p:0}] },
+                    { q: "من هو السلطان العثماني الذي فتح القسطنطينية؟", o: [{t:"محمد الفاتح", p:100}, {t:"سليم الأول", p:40}, {t:"سليمان القانوني", p:20}, {t:"مراد الثاني", p:10}, {t:"بايزيد الثاني", p:5}, {t:"عثمان الأول", p:0}] },
+                    { q: "في أي عام وقعت معركة حطين؟", o: [{t:"1187 م", p:100}, {t:"1192 م", p:40}, {t:"1175 م", p:20}, {t:"1200 م", p:10}, {t:"1215 م", p:5}, {t:"1250 م", p:0}] },
+                    { q: "من هو مؤسس الدولة العثمانية؟", o: [{t:"عثمان الأول", p:100}, {t:"أورهان غازي", p:40}, {t:"مراد الأول", p:20}, {t:"بايزيد الأول", p:10}, {t:"محمد الفاتح", p:5}, {t:"سليمان القانوني", p:0}] },
+                    { q: "ما هي المعركة التي انتصر فيها المسلمون على المغول؟", o: [{t:"عين جالوت", p:100}, {t:"مرج الصفر", p:40}, {t:"اليرموك", p:20}, {t:"القادسية", p:10}, {t:"نهاوند", p:5}, {t:"حطين", p:0}] },
+                    { q: "من هو الخليفة الأموي الذي بنى مسجد قبة الصخرة؟", o: [{t:"عبد الملك بن مروان", p:100}, {t:"الوليد بن عبد الملك", p:40}, {t:"سليمان بن عبد الملك", p:20}, {t:"هشام بن عبد الملك", p:10}, {t:"يزيد بن عبد الملك", p:5}, {t:"مروان بن الحكم", p:0}] },
+                    { q: "في أي عام بدأت الخلافة العباسية؟", o: [{t:"750 م", p:100}, {t:"732 م", p:40}, {t:"800 م", p:20}, {t:"850 م", p:10}, {t:"900 م", p:5}, {t:"950 م", p:0}] },
+                    { q: "من هو القائد المسلم الذي فتح الأندلس؟", o: [{t:"طارق بن زياد", p:100}, {t:"موسى بن نصير", p:40}, {t:"عقبة بن نافع", p:20}, {t:"يوسف بن تاشفين", p:10}, {t:"عبد الرحمن الداخل", p:5}, {t:"المنصور بن أبي عامر", p:0}] },
+                    { q: "ما هي الدولة التي حكمها هارون الرشيد؟", o: [{t:"الدولة العباسية", p:100}, {t:"الدولة الأموية", p:40}, {t:"الدولة الفاطمية", p:20}, {t:"الدولة السلجوقية", p:10}, {t:"الدولة الأيوبية", p:5}, {t:"الدولة المملوكية", p:0}] },
+                    { q: "من هو السلطان المملوكي الذي هزم المغول في عين جالوت؟", o: [{t:"سيف الدين قطز", p:100}, {t:"الظاهر بيبرس", p:40}, {t:"قلاوون", p:20}, {t:"الناصر محمد بن قلاوون", p:10}, {t:"الأشرف خليل", p:5}, {t:"الملك الصالح", p:0}] },
+                    { q: "في أي عام وقعت معركة اليرموك؟", o: [{t:"636 م", p:100}, {t:"632 م", p:40}, {t:"640 م", p:20}, {t:"630 م", p:10}, {t:"650 م", p:5}, {t:"660 م", p:0}] },
+                    { q: "من هو مؤسس الدولة الفاطمية؟", o: [{t:"عبد الله المهدي", p:100}, {t:"المعز لدين الله", p:40}, {t:"العزيز بالله", p:20}, {t:"الحاكم بأمر الله", p:10}, {t:"الظاهر لإعزاز دين الله", p:5}, {t:"المستنصر بالله", p:0}] },
+                    { q: "ما هي المعركة التي أنهت حكم الدولة الأموية في المشرق؟", o: [{t:"معركة الزاب", p:100}, {t:"معركة كربلاء", p:40}, {t:"معركة صفين", p:20}, {t:"معركة الجمل", p:10}, {t:"معركة نهاوند", p:5}, {t:"معركة اليرموك", p:0}] },
+                    { q: "من هو الخليفة العباسي الذي عاصر هارون الرشيد؟", o: [{t:"المأمون", p:100}, {t:"الهادي", p:40}, {t:"المعتصم", p:20}, {t:"الواثق", p:10}, {t:"المتوكل", p:5}, {t:"المنتصر", p:0}] },
+                    { q: "في أي عام تأسست الدولة الأموية في الأندلس؟", o: [{t:"756 م", p:100}, {t:"750 م", p:40}, {t:"800 م", p:20}, {t:"850 م", p:10}, {t:"900 م", p:5}, {t:"950 م", p:0}] },
+                    { q: "من هو القائد المسلم الذي فتح بلاد ما وراء النهر؟", o: [{t:"قتيبة بن مسلم", p:100}, {t:"محمد بن القاسم الثقفي", p:40}, {t:"موسى بن نصير", p:20}, {t:"طارق بن زياد", p:10}, {t:"عقبة بن نافع", p:5}, {t:"أسامة بن زيد", p:0}] },
+                    { q: "ما هي الدولة التي حكمها عبد الرحمن الناصر؟", o: [{t:"الدولة الأموية في الأندلس", p:100}, {t:"الدولة العباسية", p:40}, {t:"الدولة الفاطمية", p:20}, {t:"الدولة السلجوقية", p:10}, {t:"الدولة الأيوبية", p:5}, {t:"الدولة المملوكية", p:0}] },
+                    { q: "من هو السلطان العثماني الذي ضم مصر إلى الدولة العثمانية؟", o: [{t:"سليم الأول", p:100}, {t:"سليمان القانوني", p:40}, {t:"مراد الثالث", p:20}, {t:"بايزيد الثاني", p:10}, {t:"محمد الفاتح", p:5}, {t:"عثمان الأول", p:0}] },
+                    { q: "في أي عام وقعت معركة نهاوند؟", o: [{t:"642 م", p:100}, {t:"636 م", p:40}, {t:"650 م", p:20}, {t:"630 م", p:10}, {t:"660 م", p:5}, {t:"670 م", p:0}] },
+                    { q: "من هو مؤسس الدولة السلجوقية؟", o: [{t:"طغرل بك", p:100}, {t:"ألب أرسلان", p:40}, {t:"ملكشاه", p:20}, {t:"سنجر", p:10}, {t:"كليج أرسلان", p:5}, {t:"سلطان شاه", p:0}] },
+                    { q: "ما هي المعركة التي انتصر فيها المسلمون على البيزنطيين في آسيا الصغرى؟", o: [{t:"معركة ملاذكرد", p:100}, {t:"معركة اليرموك", p:40}, {t:"معركة حطين", p:20}, {t:"معركة عين جالوت", p:10}, {t:"معركة نهاوند", p:5}, {t:"معركة القادسية", p:0}] },
+                    { q: "من هو الخليفة العباسي الذي بنى مدينة سامراء؟", o: [{t:"المعتصم بالله", p:100}, {t:"المأمون", p:40}, {t:"الواثق بالله", p:20}, {t:"المتوكل على الله", p:10}, {t:"المنتصر بالله", p:5}, {t:"المستعين بالله", p:0}] }
+                ]
+            },
+            {
+                category: "الجغرافيا والدول",
+                questions: [
+                    { q: "ما هي أكبر دولة في العالم من حيث المساحة؟", o: [{t:"روسيا", p:100}, {t:"كندا", p:40}, {t:"الصين", p:20}, {t:"الولايات المتحدة", p:10}, {t:"البرازيل", p:5}, {t:"أستراليا", p:0}] },
+                    { q: "ما هي عاصمة اليابان؟", o: [{t:"طوكيو", p:100}, {t:"أوساكا", p:40}, {t:"كيوتو", p:20}, {t:"ناغويا", p:10}, {t:"هيروشيما", p:5}, {t:"سابورو", p:0}] },
+                    { q: "ما هو أطول نهر في أفريقيا؟", o: [{t:"نهر النيل", p:100}, {t:"نهر الكونغو", p:40}, {t:"نهر النيجر", p:20}, {t:"نهر الزمبيزي", p:10}, {t:"نهر الأورانج", p:5}, {t:"نهر السنغال", p:0}] },
+                    { q: "ما هي أكبر صحراء في العالم؟", o: [{t:"الصحراء الكبرى", p:100}, {t:"صحراء غوبي", p:40}, {t:"صحراء الربع الخالي", p:20}, {t:"صحراء كالاهاري", p:10}, {t:"صحراء أتاكاما", p:5}, {t:"صحراء أنتاركتيكا", p:0}] },
+                    { q: "ما هي عاصمة أستراليا؟", o: [{t:"كانبرا", p:100}, {t:"سيدني", p:40}, {t:"ملبورن", p:20}, {t:"بريسبان", p:10}, {t:"بيرث", p:5}, {t:"أديلايد", p:0}] },
+                    { q: "ما هو أكبر محيط في العالم؟", o: [{t:"المحيط الهادئ", p:100}, {t:"المحيط الأطلسي", p:40}, {t:"المحيط الهندي", p:20}, {t:"المحيط المتجمد الشمالي", p:10}, {t:"المحيط المتجمد الجنوبي", p:5}, {t:"البحر الأبيض المتوسط", p:0}] },
+                    { q: "ما هي أصغر دولة في العالم من حيث المساحة؟", o: [{t:"الفاتيكان", p:100}, {t:"موناكو", p:40}, {t:"ناورو", p:20}, {t:"توفالو", p:10}, {t:"سان مارينو", p:5}, {t:"ليختنشتاين", p:0}] },
+                    { q: "ما هي عاصمة كندا؟", o: [{t:"أوتاوا", p:100}, {t:"تورونتو", p:40}, {t:"فانكوفر", p:20}, {t:"مونتريال", p:10}, {t:"كالغاري", p:5}, {t:"كيبيك", p:0}] },
+                    { q: "ما هو أعلى جبل في العالم؟", o: [{t:"جبل إفرست", p:100}, {t:"جبل كي 2", p:40}, {t:"جبل كانغشينجونغا", p:20}, {t:"جبل لوتسي", p:10}, {t:"جبل ماكالو", p:5}, {t:"جبل تشو أويو", p:0}] },
+                    { q: "ما هي عاصمة البرازيل؟", o: [{t:"برازيليا", p:100}, {t:"ريو دي جانيرو", p:40}, {t:"ساو باولو", p:20}, {t:"بورتو أليغري", p:10}, {t:"سلفادور", p:5}, {t:"فورتاليزا", p:0}] },
+                    { q: "ما هو أكبر خليج في العالم؟", o: [{t:"خليج المكسيك", p:100}, {t:"خليج البنغال", p:40}, {t:"خليج عدن", p:20}, {t:"خليج فنلندا", p:10}, {t:"خليج تايلاند", p:5}, {t:"خليج غينيا", p:0}] },
+                    { q: "ما هي عاصمة جنوب أفريقيا؟", o: [{t:"بريتوريا", p:100}, {t:"كيب تاون", p:40}, {t:"جوهانسبرغ", p:20}, {t:"بلومفونتين", p:10}, {t:"ديربان", p:5}, {t:"بورت إليزابيث", p:0}] },
+                    { q: "ما هو أطول نهر في أوروبا؟", o: [{t:"نهر الفولجا", p:100}, {t:"نهر الدانوب", p:40}, {t:"نهر الأورال", p:20}, {t:"نهر الدنيبر", p:10}, {t:"نهر الراين", p:5}, {t:"نهر السين", p:0}] },
+                    { q: "ما هي عاصمة الصين؟", o: [{t:"بكين", p:100}, {t:"شنغهاي", p:40}, {t:"غوانغتشو", p:20}, {t:"شينزين", p:10}, {t:"هونغ كونغ", p:5}, {t:"تيانجين", p:0}] },
+                    { q: "ما هو أكبر بحر في العالم؟", o: [{t:"بحر الفلبين", p:100}, {t:"بحر المرجان", p:40}, {t:"بحر العرب", p:20}, {t:"بحر الصين الجنوبي", p:10}, {t:"بحر الكاريبي", p:5}, {t:"بحر بيرنغ", p:0}] },
+                    { q: "ما هي عاصمة الهند؟", o: [{t:"نيودلهي", p:100}, {t:"مومباي", p:40}, {t:"بنغالور", p:20}, {t:"كلكتا", p:10}, {t:"تشيناي", p:5}, {t:"حيدر أباد", p:0}] },
+                    { q: "ما هو أكبر بحيرة في العالم؟", o: [{t:"بحر قزوين", p:100}, {t:"بحيرة سوبيريور", p:40}, {t:"بحيرة فيكتوريا", p:20}, {t:"بحيرة هورون", p:10}, {t:"بحيرة ميشيغان", p:5}, {t:"بحيرة تنجانيقا", p:0}] },
+                    { q: "ما هي عاصمة فرنسا؟", o: [{t:"باريس", p:100}, {t:"مرسيليا", p:40}, {t:"ليون", p:20}, {t:"تولوز", p:10}, {t:"نيس", p:5}, {t:"نانت", p:0}] },
+                    { q: "ما هو أطول نهر في آسيا؟", o: [{t:"نهر اليانغتسي", p:100}, {t:"نهر الأمور", p:40}, {t:"نهر السند", p:20}, {t:"نهر الغانج", p:10}, {t:"نهر هوانغ هو", p:5}, {t:"نهر ميكونغ", p:0}] },
+                    { q: "ما هي عاصمة ألمانيا؟", o: [{t:"برلين", p:100}, {t:"هامبورغ", p:40}, {t:"ميونخ", p:20}, {t:"كولونيا", p:10}, {t:"فرانكفورت", p:5}, {t:"شتوتغارت", p:0}] },
+                    { q: "ما هو أكبر بركان في العالم؟", o: [{t:"مونا لوا", p:100}, {t:"كيلاويا", p:40}, {t:"إتنا", p:20}, {t:"فيزوف", p:10}, {t:"سانت هيلين", p:5}, {t:"كراكاتوا", p:0}] },
+                    { q: "ما هي عاصمة إيطاليا؟", o: [{t:"روما", p:100}, {t:"ميلانو", p:40}, {t:"نابولي", p:20}, {t:"تورينو", p:10}, {t:"فلورنسا", p:5}, {t:"فينيسيا", p:0}] },
+                    { q: "ما هو أطول نهر في أمريكا الجنوبية؟", o: [{t:"نهر الأمازون", p:100}, {t:"نهر بارانا", p:40}, {t:"نهر أورينوكو", p:20}, {t:"نهر ساو فرانسيسكو", p:10}, {t:"نهر ماديرا", p:5}, {t:"نهر توكانتينز", p:0}] },
+                    { q: "ما هي عاصمة إسبانيا؟", o: [{t:"مدريد", p:100}, {t:"برشلونة", p:40}, {t:"فالنسيا", p:20}, {t:"إشبيلية", p:10}, {t:"سرقسطة", p:5}, {t:"مالقة", p:0}] },
+                    { q: "ما هو أطول جسر في العالم؟", o: [{t:"جسر دانيانغ-كونشان الكبير", p:100}, {t:"جسر هونغ كونغ-تشوهاي-ماكاو", p:40}, {t:"جسر بحيرة بونتشارترين", p:20}, {t:"جسر مانشستر", p:10}, {t:"جسر رانغانغ", p:5}, {t:"جسر أكاشي كايكيو", p:0}] },
+                    { q: "ما هي عاصمة المملكة العربية السعودية؟", o: [{t:"الرياض", p:100}, {t:"جدة", p:40}, {t:"مكة المكرمة", p:20}, {t:"المدينة المنورة", p:10}, {t:"الدمام", p:5}, {t:"الطائف", p:0}] },
+                    { q: "ما هو أكبر خليج في العالم العربي؟", o: [{t:"الخليج العربي", p:100}, {t:"خليج عدن", p:40}, {t:"خليج عمان", p:20}, {t:"خليج السويس", p:10}, {t:"خليج العقبة", p:5}, {t:"خليج سرت", p:0}] },
+                    { q: "ما هي عاصمة مصر؟", o: [{t:"القاهرة", p:100}, {t:"الإسكندرية", p:40}, {t:"الجيزة", p:20}, {t:"بورسعيد", p:10}, {t:"السويس", p:5}, {t:"الأقصر", p:0}] },
+                    { q: "ما هو أطول نهر في العالم العربي؟", o: [{t:"نهر النيل", p:100}, {t:"نهر الفرات", p:40}, {t:"نهر دجلة", p:20}, {t:"نهر الأردن", p:10}, {t:"نهر العاصي", p:5}, {t:"نهر الليطاني", p:0}] },
+                    { q: "ما هي عاصمة الإمارات العربية المتحدة؟", o: [{t:"أبو ظبي", p:100}, {t:"دبي", p:40}, {t:"الشارقة", p:20}, {t:"عجمان", p:10}, {t:"رأس الخيمة", p:5}, {t:"الفجيرة", p:0}] }
+                ]
+            },
+            {
+                category: "الدين والقرآن الكريم",
+                questions: [
+                    { q: "كم عدد سور القرآن الكريم؟", o: [{t:"114", p:100}, {t:"113", p:40}, {t:"115", p:20}, {t:"112", p:10}, {t:"116", p:5}, {t:"110", p:0}] },
+                    { q: "ما هي السورة التي تسمى قلب القرآن؟", o: [{t:"سورة يس", p:100}, {t:"سورة الفاتحة", p:40}, {t:"سورة البقرة", p:20}, {t:"سورة الكهف", p:10}, {t:"سورة مريم", p:5}, {t:"سورة النور", p:0}] },
+                    { q: "كم عدد آيات القرآن الكريم؟", o: [{t:"6236", p:100}, {t:"6200", p:40}, {t:"6300", p:20}, {t:"6000", p:10}, {t:"6500", p:5}, {t:"6666", p:0}] },
+                    { q: "ما هي أطول سورة في القرآن الكريم؟", o: [{t:"سورة البقرة", p:100}, {t:"سورة آل عمران", p:40}, {t:"سورة النساء", p:20}, {t:"سورة المائدة", p:10}, {t:"سورة الأنعام", p:5}, {t:"سورة الأعراف", p:0}] },
+                    { q: "ما هي أقصر سورة في القرآن الكريم؟", o: [{t:"سورة الكوثر", p:100}, {t:"سورة النصر", p:40}, {t:"سورة الإخلاص", p:20}, {t:"سورة الفلق", p:10}, {t:"سورة الناس", p:5}, {t:"سورة المسد", p:0}] },
+                    { q: "ما هي السورة التي تسمى بسورة التوديع؟", o: [{t:"سورة النصر", p:100}, {t:"سورة الفتح", p:40}, {t:"سورة الحجرات", p:20}, {t:"سورة الممتحنة", p:10}, {t:"سورة الصف", p:5}, {t:"سورة الجمعة", p:0}] },
+                    { q: "كم عدد أحزاب القرآن الكريم؟", o: [{t:"60", p:100}, {t:"30", p:40}, {t:"120", p:20}, {t:"240", p:10}, {t:"50", p:5}, {t:"70", p:0}] },
+                    { q: "ما هي السورة التي تبدأ بالحمد لله؟", o: [{t:"سورة الفاتحة", p:100}, {t:"سورة الأنعام", p:40}, {t:"سورة الكهف", p:20}, {t:"سورة سبأ", p:10}, {t:"سورة فاطر", p:5}, {t:"سورة نوح", p:0}] },
+                    { q: "ما هي السورة التي تسمى بعروس القرآن؟", o: [{t:"سورة الرحمن", p:100}, {t:"سورة يس", p:40}, {t:"سورة الملك", p:20}, {t:"سورة الواقعة", p:10}, {t:"سورة الدخان", p:5}, {t:"سورة القلم", p:0}] },
+                    { q: "كم عدد السور المكية في القرآن الكريم؟", o: [{t:"86", p:100}, {t:"82", p:40}, {t:"90", p:20}, {t:"80", p:10}, {t:"85", p:5}, {t:"88", p:0}] },
+                    { q: "ما هي السورة التي تسمى بسورة النساء الصغرى؟", o: [{t:"سورة الطلاق", p:100}, {t:"سورة الممتحنة", p:40}, {t:"سورة المجادلة", p:20}, {t:"سورة الحجرات", p:10}, {t:"سورة التحريم", p:5}, {t:"سورة الطور", p:0}] },
+                    { q: "ما هي السورة التي تسمى بقلب القرآن؟", o: [{t:"سورة يس", p:100}, {t:"سورة الفاتحة", p:40}, {t:"سورة البقرة", p:20}, {t:"سورة الكهف", p:10}, {t:"سورة مريم", p:5}, {t:"سورة النور", p:0}] },
+                    { q: "كم عدد السور المدنية في القرآن الكريم؟", o: [{t:"28", p:100}, {t:"30", p:40}, {t:"25", p:20}, {t:"32", p:10}, {t:"26", p:5}, {t:"24", p:0}] },
+                    { q: "ما هي السورة التي تسمى بفاضحة اليهود؟", o: [{t:"سورة التوبة", p:100}, {t:"سورة البقرة", p:40}, {t:"سورة آل عمران", p:20}, {t:"سورة النساء", p:10}, {t:"سورة المائدة", p:5}, {t:"سورة الأنعام", p:0}] },
+                    { q: "ما هي السورة التي تسمى بسورة الحواريين؟", o: [{t:"سورة الصف", p:100}, {t:"سورة الجمعة", p:40}, {t:"سورة المنافقون", p:20}, {t:"سورة التغابن", p:10}, {t:"سورة الطلاق", p:5}, {t:"سورة التحريم", p:0}] },
+                    { q: "كم عدد آيات سورة البقرة؟", o: [{t:"286", p:100}, {t:"282", p:40}, {t:"290", p:20}, {t:"280", p:10}, {t:"295", p:5}, {t:"300", p:0}] },
+                    { q: "ما هي السورة التي تسمى بسورة الفرائض؟", o: [{t:"سورة النساء", p:100}, {t:"سورة البقرة", p:40}, {t:"سورة المائدة", p:20}, {t:"سورة الأنفال", p:10}, {t:"سورة التوبة", p:5}, {t:"سورة النحل", p:0}] },
+                    { q: "ما هي السورة التي تسمى بعماد الدين؟", o: [{t:"سورة الفاتحة", p:100}, {t:"سورة البقرة", p:40}, {t:"سورة آل عمران", p:20}, {t:"سورة النساء", p:10}, {t:"سورة المائدة", p:5}, {t:"سورة الأنعام", p:0}] },
+                    { q: "كم عدد السور التي تبدأ بالحروف المقطعة؟", o: [{t:"29", p:100}, {t:"28", p:40}, {t:"30", p:20}, {t:"27", p:10}, {t:"31", p:5}, {t:"26", p:0}] },
+                    { q: "ما هي السورة التي تسمى بسورة النبي؟", o: [{t:"سورة الأحزاب", p:100}, {t:"سورة محمد", p:40}, {t:"سورة الفتح", p:20}, {t:"سورة الحجرات", p:10}, {t:"سورة التحريم", p:5}, {t:"سورة الطلاق", p:0}] },
+                    { q: "ما هي السورة التي تسمى بقلب القرآن؟", o: [{t:"سورة يس", p:100}, {t:"سورة الفاتحة", p:40}, {t:"سورة البقرة", p:20}, {t:"سورة الكهف", p:10}, {t:"سورة مريم", p:5}, {t:"سورة النور", p:0}] },
+                    { q: "كم عدد آيات سورة آل عمران؟", o: [{t:"200", p:100}, {t:"190", p:40}, {t:"210", p:20}, {t:"180", p:10}, {t:"220", p:5}, {t:"230", p:0}] },
+                    { q: "ما هي السورة التي تسمى بسورة القتال؟", o: [{t:"سورة محمد", p:100}, {t:"سورة الأنفال", p:40}, {t:"سورة التوبة", p:20}, {t:"سورة الأحزاب", p:10}, {t:"سورة الحشر", p:5}, {t:"سورة الصف", p:0}] },
+                    { q: "ما هي السورة التي تسمى بقلب القرآن؟", o: [{t:"سورة يس", p:100}, {t:"سورة الفاتحة", p:40}, {t:"سورة البقرة", p:20}, {t:"سورة الكهف", p:10}, {t:"سورة مريم", p:5}, {t:"سورة النور", p:0}] },
+                    { q: "كم عدد السور التي تبدأ بالتسبيح؟", o: [{t:"7", p:100}, {t:"5", p:40}, {t:"8", p:20}, {t:"6", p:10}, {t:"9", p:5}, {t:"4", p:0}] },
+                    { q: "ما هي السورة التي تسمى بسورة التوديع؟", o: [{t:"سورة النصر", p:100}, {t:"سورة الفتح", p:40}, {t:"سورة الحجرات", p:20}, {t:"سورة الممتحنة", p:10}, {t:"سورة الصف", p:5}, {t:"سورة الجمعة", p:0}] },
+                    { q: "ما هي السورة التي تسمى بقلب القرآن؟", o: [{t:"سورة يس", p:100}, {t:"سورة الفاتحة", p:40}, {t:"سورة البقرة", p:20}, {t:"سورة الكهف", p:10}, {t:"سورة مريم", p:5}, {t:"سورة النور", p:0}] },
+                    { q: "كم عدد آيات سورة النساء؟", o: [{t:"176", p:100}, {t:"170", p:40}, {t:"180", p:20}, {t:"165", p:10}, {t:"190", p:5}, {t:"200", p:0}] },
+                    { q: "ما هي السورة التي تسمى بسورة البراءة؟", o: [{t:"سورة التوبة", p:100}, {t:"سورة البقرة", p:40}, {t:"سورة آل عمران", p:20}, {t:"سورة النساء", p:10}, {t:"سورة المائدة", p:5}, {t:"سورة الأنعام", p:0}] },
+                    { q: "ما هي السورة التي تسمى بقلب القرآن؟", o: [{t:"سورة يس", p:100}, {t:"سورة الفاتحة", p:40}, {t:"سورة البقرة", p:20}, {t:"سورة الكهف", p:10}, {t:"سورة مريم", p:5}, {t:"سورة النور", p:0}] }
+                ]
+            },
+            {
+                category: "الأدب واللغة العربية",
+                questions: [
+                    { q: "من هو مؤلف كتاب 'الأغاني'؟", o: [{t:"أبو الفرج الأصفهاني", p:100}, {t:"الجاحظ", p:40}, {t:"ابن قتيبة", p:20}, {t:"المبرد", p:10}, {t:"الزمخشري", p:5}, {t:"ابن منظور", p:0}] },
+                    { q: "ما هي بحرية الشعر العربي؟", o: [{t:"16", p:100}, {t:"15", p:40}, {t:"14", p:20}, {t:"17", p:10}, {t:"18", p:5}, {t:"19", p:0}] },
+                    { q: "من هو صاحب ديوان 'شوقيات'؟", o: [{t:"أحمد شوقي", p:100}, {t:"حافظ إبراهيم", p:40}, {t:"علي محمود طه", p:20}, {t:"إيليا أبو ماضي", p:10}, {t:"أبو القاسم الشابي", p:5}, {t:"نازك الملائكة", p:0}] },
+                    { q: "ما هي لغة الضاد؟", o: [{t:"اللغة العربية", p:100}, {t:"اللغة الفارسية", p:40}, {t:"اللغة التركية", p:20}, {t:"اللغة العبرية", p:10}, {t:"اللغة الأمازيغية", p:5}, {t:"اللغة الكردية", p:0}] },
+                    { q: "من هو مؤلف كتاب 'الكامل في اللغة والأدب'؟", o: [{t:"المبرد", p:100}, {t:"الجاحظ", p:40}, {t:"ابن قتيبة", p:20}, {t:"أبو حيان التوحيدي", p:10}, {t:"الزمخشري", p:5}, {t:"ابن منظور", p:0}] },
+                    { q: "ما هي عاصمة الثقافة العربية لعام 2023؟", o: [{t:"الخرطوم", p:100}, {t:"الرباط", p:40}, {t:"تونس", p:20}, {t:"الجزائر", p:10}, {t:"بغداد", p:5}, {t:"دمشق", p:0}] },
+                    { q: "من هو مؤلف كتاب 'البيان والتبيين'؟", o: [{t:"الجاحظ", p:100}, {t:"المبرد", p:40}, {t:"ابن قتيبة", p:20}, {t:"أبو حيان التوحيدي", p:10}, {t:"الزمخشري", p:5}, {t:"ابن منظور", p:0}] },
+                    { q: "ما هو علم العروض؟", o: [{t:"علم بحور الشعر", p:100}, {t:"علم النحو", p:40}, {t:"علم الصرف", p:20}, {t:"علم البلاغة", p:10}, {t:"علم المعاني", p:5}, {t:"علم البيان", p:0}] },
+                    { q: "من هو صاحب ديوان 'أزهار ذابلة'؟", o: [{t:"إيليا أبو ماضي", p:100}, {t:"أحمد شوقي", p:40}, {t:"حافظ إبراهيم", p:20}, {t:"علي محمود طه", p:10}, {t:"أبو القاسم الشابي", p:5}, {t:"نازك الملائكة", p:0}] },
+                    { q: "ما هو الكتاب الذي ألفه سيبويه؟", o: [{t:"الكتاب", p:100}, {t:"المقتضب", p:40}, {t:"الجمهرة", p:20}, {t:"الأصول", p:10}, {t:"المفصل", p:5}, {t:"الإنصاف", p:0}] },
+                    { q: "من هو مؤلف كتاب 'مقدمة ابن خلدون'؟", o: [{t:"ابن خلدون", p:100}, {t:"الجاحظ", p:40}, {t:"ابن قتيبة", p:20}, {t:"المبرد", p:10}, {t:"الزمخشري", p:5}, {t:"ابن منظور", p:0}] },
+                    { q: "ما هي أشهر مؤلفات طه حسين؟", o: [{t:"الأيام", p:100}, {t:"دعاء الكروان", p:40}, {t:"حديث الأربعاء", p:20}, {t:"في الشعر الجاهلي", p:10}, {t:"مستقبل الثقافة في مصر", p:5}, {t:"أديب", p:0}] },
+                    { q: "من هو مؤلف كتاب 'لسان العرب'؟", o: [{t:"ابن منظور", p:100}, {t:"الجاحظ", p:40}, {t:"ابن قتيبة", p:20}, {t:"المبرد", p:10}, {t:"الزمخشري", p:5}, {t:"الفيروزآبادي", p:0}] },
+                    { q: "ما هي الديوانية في الأدب العربي؟", o: [{t:"مجلس الشعر والأدب", p:100}, {t:"مجلس القضاء", p:40}, {t:"مجلس الإدارة", p:20}, {t:"مجلس الوزراء", p:10}, {t:"مجلس الشورى", p:5}, {t:"مجلس النواب", p:0}] },
+                    { q: "من هو مؤلف كتاب 'العقد الفريد'؟", o: [{t:"ابن عبد ربه", p:100}, {t:"الجاحظ", p:40}, {t:"ابن قتيبة", p:20}, {t:"المبرد", p:10}, {t:"الزمخشري", p:5}, {t:"ابن منظور", p:0}] },
+                    { q: "ما هو المعلقات في الشعر العربي؟", o: [{t:"أشهر القصائد في العصر الجاهلي", p:100}, {t:"قصائد العصر الأموي", p:40}, {t:"قصائد العصر العباسي", p:20}, {t:"قصائد العصر الأندلسي", p:10}, {t:"قصائد العصر الحديث", p:5}, {t:"قصائد العصر المملوكي", p:0}] },
+                    { q: "من هو مؤلف كتاب 'البخلاء'؟", o: [{t:"الجاحظ", p:100}, {t:"المبرد", p:40}, {t:"ابن قتيبة", p:20}, {t:"أبو حيان التوحيدي", p:10}, {t:"الزمخشري", p:5}, {t:"ابن منظور", p:0}] },
+                    { q: "ما هو علم النحو؟", o: [{t:"علم قواعد اللغة العربية", p:100}, {t:"علم الشعر", p:40}, {t:"علم البلاغة", p:20}, {t:"علم الصرف", p:10}, {t:"علم العروض", p:5}, {t:"علم المعاني", p:0}] },
+                    { q: "من هو مؤلف كتاب 'الحيوان'؟", o: [{t:"الجاحظ", p:100}, {t:"المبرد", p:40}, {t:"ابن قتيبة", p:20}, {t:"أبو حيان التوحيدي", p:10}, {t:"الزمخشري", p:5}, {t:"ابن منظور", p:0}] },
+                    { q: "ما هي أشهر مؤلفات نجيب محفوظ؟", o: [{t:"الثلاثية", p:100}, {t:"زقاق المدق", p:40}, {t:"بين القصرين", p:20}, {t:"قصر الشوق", p:10}, {t:"السكرية", p:5}, {t:"أولاد حارتنا", p:0}] },
+                    { q: "من هو مؤلف كتاب 'معجم البلدان'؟", o: [{t:"ياقوت الحموي", p:100}, {t:"الجاحظ", p:40}, {t:"ابن قتيبة", p:20}, {t:"المبرد", p:10}, {t:"الزمخشري", p:5}, {t:"ابن منظور", p:0}] },
+                    { q: "ما هو الشعر العمودي؟", o: [{t:"الشعر التقليدي ببحور الخليل", p:100}, {t:"الشعر الحر", p:40}, {t:"الشعر النبطي", p:20}, {t:"الشعر الملحمي", p:10}, {t:"الشعر الغنائي", p:5}, {t:"الشعر المسرحي", p:0}] },
+                    { q: "من هو مؤلف كتاب 'وفيات الأعيان'؟", o: [{t:"ابن خلكان", p:100}, {t:"الجاحظ", p:40}, {t:"ابن قتيبة", p:20}, {t:"المبرد", p:10}, {t:"الزمخشري", p:5}, {t:"ابن منظور", p:0}] },
+                    { q: "ما هي أشهر مؤلفات توفيق الحكيم؟", o: [{t:"أهل الكهف", p:100}, {t:"عودة الروح", p:40}, {t:"يوميات نائب في الأرياف", p:20}, {t:"السلطان الحائر", p:10}, {t:"شهرزاد", p:5}, {t:"الطريق", p:0}] },
+                    { q: "من هو مؤلف كتاب 'تاج العروس'؟", o: [{t:"الزبيدي", p:100}, {t:"الجاحظ", p:40}, {t:"ابن قتيبة", p:20}, {t:"المبرد", p:10}, {t:"الزمخشري", p:5}, {t:"ابن منظور", p:0}] },
+                    { q: "ما هو الشعر الحر؟", o: [{t:"الشعر الذي لا يلتزم بالبحور التقليدية", p:100}, {t:"الشعر العمودي", p:40}, {t:"الشعر النبطي", p:20}, {t:"الشعر الملحمي", p:10}, {t:"الشعر الغنائي", p:5}, {t:"الشعر المسرحي", p:0}] },
+                    { q: "من هو مؤلف كتاب 'وفيات الأعيان'؟", o: [{t:"ابن خلكان", p:100}, {t:"الجاحظ", p:40}, {t:"ابن قتيبة", p:20}, {t:"المبرد", p:10}, {t:"الزمخشري", p:5}, {t:"ابن منظور", p:0}] },
+                    { q: "ما هي أشهر مؤلفات ميخائيل نعيمة؟", o: [{t:"الغربال", p:100}, {t:"مرداد", p:40}, {t:"سبعون", p:20}, {t:"أبو بطة", p:10}, {t:"كرم على درب", p:5}, {t:"كان ما كان", p:0}] },
+                    { q: "من هو مؤلف كتاب 'القاموس المحيط'؟", o: [{t:"الفيروزآبادي", p:100}, {t:"الجاحظ", p:40}, {t:"ابن قتيبة", p:20}, {t:"المبرد", p:10}, {t:"الزمخشري", p:5}, {t:"ابن منظور", p:0}] },
+                    { q: "ما هو الأدب المقارن؟", o: [{t:"دراسة العلاقات بين الآداب المختلفة", p:100}, {t:"دراسة الأدب العربي فقط", p:40}, {t:"دراسة الأدب العالمي فقط", p:20}, {t:"دراسة الشعر فقط", p:10}, {t:"دراسة النثر فقط", p:5}, {t:"دراسة المسرح فقط", p:0}] }
+                ]
+            },
+            {
+                category: "الرياضة والألعاب",
+                questions: [
+                    { q: "في أي عام أقيمت أول بطولة كأس عالم لكرة القدم؟", o: [{t:"1930", p:100}, {t:"1920", p:40}, {t:"1934", p:20}, {t:"1950", p:10}, {t:"1960", p:5}, {t:"1970", p:0}] },
+                    { q: "من هو اللاعب الذي سجل أكبر عدد من الأهداف في تاريخ كرة القدم؟", o: [{t:"كريستيانو رونالدو", p:100}, {t:"ليونيل ميسي", p:40}, {t:"بيليه", p:20}, {t:"روماريو", p:10}, {t:"جيرد مولر", p:5}, {t:"دييجو مارادونا", p:0}] },
+                    { q: "ما هي اللعبة التي تسمى 'لعبة الملوك'؟", o: [{t:"الشطرنج", p:100}, {t:"البولو", p:40}, {t:"الجولف", p:20}, {t:"التنس", p:10}, {t:"الكركيت", p:5}, {t:"الهوكي", p:0}] },
+                    { q: "من هو أكثر لاعب فاز ببطولة ويمبلدون للتنس؟", o: [{t:"روجر فيدرر", p:100}, {t:"نوفاك ديوكوفيتش", p:40}, {t:"بيت سامبراس", p:20}, {t:"رافاييل نادال", p:10}, {t:"بيورن بورغ", p:5}, {t:"أندريه أغاسي", p:0}] },
+                    { q: "في أي مدينة تقع الألعاب الأولمبية الصيفية 2024؟", o: [{t:"باريس", p:100}, {t:"لوس أنجلوس", p:40}, {t:"طوكيو", p:20}, {t:"ريو دي جانيرو", p:10}, {t:"لندن", p:5}, {t:"بكين", p:0}] },
+                    { q: "ما هي الرياضة الوطنية في كندا؟", o: [{t:"الهوكي على الجليد", p:100}, {t:"كرة القدم", p:40}, {t:"كرة السلة", p:20}, {t:"البيسبول", p:10}, {t:"اللاكروس", p:5}, {t:"الكيرلينج", p:0}] },
+                    { q: "من هو اللاعب العربي الذي فاز بجائزة الكرة الذهبية؟", o: [{t:"جورج ويا", p:100}, {t:"محمد صلاح", p:40}, {t:"رياض محرز", p:20}, {t:"صادق المهدي", p:10}, {t:"عبدالرزاق حمد الله", p:5}, {t:"ياسر القحطاني", p:0}] },
+                    { q: "كم عدد اللاعبين في فريق كرة القدم؟", o: [{t:"11", p:100}, {t:"10", p:40}, {t:"12", p:20}, {t:"9", p:10}, {t:"13", p:5}, {t:"14", p:0}] },
+                    { q: "ما هي أطول مسافة في سباقات ألعاب القوى؟", o: [{t:"ماراثون", p:100}, {t:"100 متر", p:40}, {t:"200 متر", p:20}, {t:"400 متر", p:10}, {t:"800 متر", p:5}, {t:"1500 متر", p:0}] },
+                    { q: "من هو اللاعب الذي سجل هدف 'يد الله' الشهير؟", o: [{t:"دييجو مارادونا", p:100}, {t:"ليونيل ميسي", p:40}, {t:"كريستيانو رونالدو", p:20}, {t:"بيليه", p:10}, {t:"زين الدين زيدان", p:5}, {t:"رونالدينيو", p:0}] },
+                    { q: "ما هي الرياضة التي تلعب في ملعب يسمى 'الملعب الأزرق'؟", o: [{t:"التزلج على الجليد", p:100}, {t:"كرة القدم", p:40}, {t:"كرة السلة", p:20}, {t:"الكرة الطائرة", p:10}, {t:"الهوكي", p:5}, {t:"السباحة", p:0}] },
+                    { q: "من هو اللاعب الذي فاز بأكبر عدد من ألقاب الجراند سلام في التنس؟", o: [{t:"نوفاك ديوكوفيتش", p:100}, {t:"روجر فيدرر", p:40}, {t:"رافاييل نادال", p:20}, {t:"بيت سامبراس", p:10}, {t:"أندريه أغاسي", p:5}, {t:"بيورن بورغ", p:0}] },
+                    { q: "ما هي الدولة التي فازت بأكبر عدد من ميداليات أولمبية في التاريخ؟", o: [{t:"الولايات المتحدة", p:100}, {t:"الصين", p:40}, {t:"روسيا", p:20}, {t:"بريطانيا", p:10}, {t:"ألمانيا", p:5}, {t:"فرنسا", p:0}] },
+                    { q: "من هو اللاعب العربي الذي لعب في الدوري الإنجليزي الممتاز؟", o: [{t:"محمد صلاح", p:100}, {t:"رياض محرز", p:40}, {t:"ياسر القحطاني", p:20}, {t:"عبدالرزاق حمد الله", p:10}, {t:"عمر السومة", p:5}, {t:"فيصل الدوسري", p:0}] },
+                    { q: "ما هي الرياضة التي تلعب بكرة وردية؟", o: [{t:"الكريكت", p:100}, {t:"كرة القدم", p:40}, {t:"كرة السلة", p:20}, {t:"الكرة الطائرة", p:10}, {t:"التنس", p:5}, {t:"البيسبول", p:0}] },
+                    { q: "من هو اللاعب الذي سجل أكبر عدد من الأهداف في مباراة واحدة في كأس العالم؟", o: [{t:"أوليغ سالينكو", p:100}, {t:"بيليه", p:40}, {t:"جيرد مولر", p:20}, {t:"رونالدو", p:10}, {t:"دييجو مارادونا", p:5}, {t:"زين الدين زيدان", p:0}] },
+                    { q: "ما هي الرياضة التي تسمى 'اللعبة الجميلة'؟", o: [{t:"كرة القدم", p:100}, {t:"كرة السلة", p:40}, {t:"الكرة الطائرة", p:20}, {t:"التنس", p:10}, {t:"الجولف", p:5}, {t:"البيسبول", p:0}] },
+                    { q: "من هو اللاعب الذي فاز بجائزة الكرة الذهبية 6 مرات؟", o: [{t:"ليونيل ميسي", p:100}, {t:"كريستيانو رونالدو", p:40}, {t:"دييجو مارادونا", p:20}, {t:"بيليه", p:10}, {t:"زين الدين زيدان", p:5}, {t:"رونالدينيو", p:0}] },
+                    { q: "ما هي الرياضة التي تلعب في حلبة تسمى 'رينغ'؟", o: [{t:"الملاكمة", p:100}, {t:"المصارعة", p:40}, {t:"الجودو", p:20}, {t:"الكاراتيه", p:10}, {t:"التايكواندو", p:5}, {t:"المبارزة", p:0}] },
+                    { q: "من هو اللاعب العربي الذي لعب في نادي برشلونة الإسباني؟", o: [{t:"رياض محرز", p:100}, {t:"محمد صلاح", p:40}, {t:"ياسر القحطاني", p:20}, {t:"عبدالرزاق حمد الله", p:10}, {t:"عمر السومة", p:5}, {t:"فيصل الدوسري", p:0}] },
+                    { q: "ما هي الرياضة التي تلعب بعصا وكرات ملونة؟", o: [{t:"البلياردو", p:100}, {t:"الجولف", p:40}, {t:"الهوكي", p:20}, {t:"اللاكروس", p:10}, {t:"الكريكت", p:5}, {t:"البيسبول", p:0}] },
+                    { q: "من هو اللاعب الذي فاز ببطولة ويمبلدون 8 مرات؟", o: [{t:"روجر فيدرر", p:100}, {t:"نوفاك ديوكوفيتش", p:40}, {t:"بيت سامبراس", p:20}, {t:"رافاييل نادال", p:10}, {t:"بيورن بورغ", p:5}, {t:"أندريه أغاسي", p:0}] },
+                    { q: "ما هي الدولة التي فازت بكأس العالم 2018؟", o: [{t:"فرنسا", p:100}, {t:"كرواتيا", p:40}, {t:"البرازيل", p:20}, {t:"الأرجنتين", p:10}, {t:"ألمانيا", p:5}, {t:"إسبانيا", p:0}] },
+                    { q: "من هو اللاعب العربي الذي لعب في نادي ريال مدريد الإسباني؟", o: [{t:"محمد صلاح", p:100}, {t:"رياض محرز", p:40}, {t:"ياسر القحطاني", p:20}, {t:"عبدالرزاق حمد الله", p:10}, {t:"عمر السومة", p:5}, {t:"فيصل الدوسري", p:0}] },
+                    { q: "ما هي الرياضة التي تلعب بكرة برتقالية؟", o: [{t:"كرة السلة", p:100}, {t:"كرة القدم", p:40}, {t:"الكرة الطائرة", p:20}, {t:"التنس", p:10}, {t:"اليد", p:5}, {t:"الهوكي", p:0}] },
+                    { q: "من هو اللاعب الذي سجل أكبر عدد من الأهداف في تاريخ الدوري الإنجليزي الممتاز؟", o: [{t:"آلان شيرر", p:100}, {t:"واين روني", p:40}, {t:"أندي كول", p:20}, {t:"هاري كين", p:10}, {t:"سيرجيو أغويرو", p:5}, {t:"تييري هنري", p:0}] },
+                    { q: "ما هي الرياضة التي تسمى 'اللعبة البيضاء'؟", o: [{t:"التنس", p:100}, {t:"الجولف", p:40}, {t:"الكريكت", p:20}, {t:"البولو", p:10}, {t:"الهوكي", p:5}, {t:"الكرة الطائرة", p:0}] },
+                    { q: "من هو اللاعب العربي الذي فاز بدوري أبطال أوروبا؟", o: [{t:"رياض محرز", p:100}, {t:"محمد صلاح", p:40}, {t:"ياسر القحطاني", p:20}, {t:"عبدالرزاق حمد الله", p:10}, {t:"عمر السومة", p:5}, {t:"فيصل الدوسري", p:0}] },
+                    { q: "ما هي الرياضة التي تلعب في ملعب يسمى 'الملعب الأخضر'؟", o: [{t:"الجولف", p:100}, {t:"كرة القدم", p:40}, {t:"كرة السلة", p:20}, {t:"الكرة الطائرة", p:10}, {t:"التنس", p:5}, {t:"الهوكي", p:0}] },
+                    { q: "من هو اللاعب الذي فاز بجائزة الكرة الذهبية 5 مرات؟", o: [{t:"كريستيانو رونالدو", p:100}, {t:"ليونيل ميسي", p:40}, {t:"دييجو مارادونا", p:20}, {t:"بيليه", p:10}, {t:"زين الدين زيدان", p:5}, {t:"رونالدينيو", p:0}] }
+                ]
+            }
+        ];
+
+        function getRandomQuestion() {
+            const cat = questions[Math.floor(Math.random() * questions.length)];
+            return { ...cat.questions[Math.floor(Math.random() * cat.questions.length)], category: cat.category };
+        }
+
+        onAuthStateChanged(auth, async (u) => {
+            if (u) {
+                user = u;
+                const snap = await getDoc(doc(db, "users", u.uid));
+                userData = snap.data();
+                
+                document.getElementById('uGems').textContent = userData.gems.toLocaleString();
+                document.getElementById('uAvatar').src = u.photoURL || `https://ui-avatars.com/api/?name=${userData.name}`;
+                document.getElementById('uAvatar').style.display = 'inline-block';
+                document.getElementById('uWins').style.display = 'inline-flex'; document.getElementById('uWinsCount').textContent = (userData.wins || 0) + ' 🏆';
+                document.getElementById('loginBtn').style.display = 'none';
+                
+                // عرض عدد مرات الفوز للمستخدم
+                if (userData.wins && userData.wins > 0) {
+                    
+                    document.getElementById('uWins').style.display = 'inline-flex';
+                    document.getElementById('uWinsCount').textContent = userData.wins;
+                }
+            }
+        });
+
+        window.joinMatch = async () => {
+            if (!user) return document.getElementById('authModal').style.display='flex';
+            const pLimit = parseInt(document.getElementById('selPlayers').value);
+            const fee = parseInt(document.getElementById('selFee').value);
+            if (userData.gems < fee) return alert("رصيدك غير كافٍ!");
+
+            await updateDoc(doc(db, "users", user.uid), { gems: increment(-fee) });
+            userData.gems -= fee;
+            document.getElementById('uGems').textContent = userData.gems.toLocaleString();
+
+            document.getElementById('setupView').style.display = 'none';
+            document.getElementById('lobbyView').style.display = 'block';
+
+            const qRoom = query(collection(db, "rooms"), where("status", "==", "waiting"), where("maxPlayers", "==", pLimit), where("fee", "==", fee));
+            const snap = await getDocs(qRoom);
+            
+            const myPlayer = { 
+                uid: user.uid, name: userData.name, 
+                photo: user.photoURL || `https://ui-avatars.com/api/?name=${userData.name}`, 
+                score: 0, status: "active", answeredQ: -1 
+            };
+
+            if (!snap.empty) {
+                roomId = snap.docs[0].id;
+                await updateDoc(doc(db, "rooms", roomId), { players: arrayUnion(myPlayer) });
+            } else {
+                const res = await addDoc(collection(db, "rooms"), {
+                    maxPlayers: pLimit, fee: fee, status: "waiting",
+                    players: [myPlayer], currentQ: 0, createdAt: Date.now()
+                });
+                roomId = res.id;
+            }
+            monitorRoom();
+        };
+
+        function monitorRoom() {
+            onSnapshot(doc(db, "rooms", roomId), async (snap) => {
+                const data = snap.data();
+                if (!data) return;
+                currentRoomData = data;
+
+                document.getElementById('playersGrid').innerHTML = data.players.map(p => `
+                    <div class="p-box ${p.status === 'eliminated' ? 'eliminated' : ''}">
+                        <img src="${p.photo}"><div class="status-on"></div>
+                        <p style="font-size:10px">${p.name}</p>
+                    </div>`).join('');
+                
+                document.getElementById('lobbyStatus').textContent = `بانتظار الأبطال (${data.players.length} / ${data.maxPlayers})`;
+
+                if (data.players.length >= data.maxPlayers && data.status === "waiting") {
+                    await updateDoc(doc(db, "rooms", roomId), { status: "active", startedAt: Date.now() });
+                }
+
+                if (data.status === "active") {
+                    document.getElementById('lobbyView').style.display = 'none';
+                    document.getElementById('gameArena').style.display = 'block';
+                    syncGame(data);
+                }
+                
+                if (data.status === "finished") showWinner(data);
+            });
+        }
+
+        // ==============================================
+        // نظام التزامن المعتمد على الوقت العالمي
+        // ==============================================
+        function syncGame(data) {
+            const now = Date.now();
+            const elapsedSinceStart = Math.floor((now - data.startedAt) / 1000);
+            const questionDuration = 30; // ثانية
+            const calculatedQ = Math.floor(elapsedSinceStart / questionDuration);
+            const timeLeft = questionDuration - (elapsedSinceStart % questionDuration);
+
+            // إذا انتهى الوقت لجميع الأسئلة
+            if (calculatedQ >= 10) {
+                if (data.status !== "finished") processRoundEnd(data);
+                return;
+            }
+
+            // تحديث رقم السؤال عالمياً في الواجهة بناءً على الوقت
+            if (data.currentQ !== calculatedQ) {
+                updateDoc(doc(db, "rooms", roomId), { currentQ: calculatedQ });
+            }
+
+            const p1 = data.players[0];
+            const p2 = data.players[1] || p1;
+            document.getElementById('p1Score').textContent = p1.score;
+            document.getElementById('p2Score').textContent = p2.score;
+            document.getElementById('p1Name').textContent = p1.name;
+            document.getElementById('p2Name').textContent = p2.name;
+            document.getElementById('p1Img').src = p1.photo;
+            document.getElementById('p2Img').src = p2.photo;
+
+            document.getElementById('qCount').textContent = `السؤال ${calculatedQ + 1} / 10`;
+            
+            // جلب سؤال ثابت لكل رقم سؤال (باستخدام رقم السؤال كبذرة بسيطة)
+            const qObj = questions[calculatedQ % questions.length].questions[calculatedQ % questions[0].questions.length]; 
+            document.getElementById('qText').textContent = qObj.q;
+            document.getElementById('categoryTag').textContent = questions[calculatedQ % questions.length].category;
+
+            const me = data.players.find(p => p.uid === user.uid);
+            const alreadyAnswered = me && me.answeredQ === calculatedQ;
+
+            const oGrid = document.getElementById('optionsGrid');
+            oGrid.innerHTML = "";
+            qObj.o.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "opt-btn";
+                btn.textContent = opt.t;
+                btn.disabled = alreadyAnswered;
+                btn.onclick = () => submitAnswer(opt.p, calculatedQ, data);
+                oGrid.appendChild(btn);
+            });
+
+            // تحديث العداد البصري
+            updateVisualTimer(timeLeft);
+        }
+
+        function updateVisualTimer(seconds) {
+            const bar = document.getElementById('timerBar');
+            const txt = document.getElementById('timerText');
+            bar.style.width = (seconds / 60) * 100 + "%";
+            txt.textContent = `الوقت المتبقي: ${seconds} ثانية`;
+            if (seconds <= 10) txt.style.color = "var(--red)";
+            else txt.style.color = "var(--gold)";
+        }
+
+        // تحديث مستمر للعداد كل ثانية
+        setInterval(() => {
+            if (currentRoomData && currentRoomData.status === "active") {
+                syncGame(currentRoomData);
+            }
+        }, 1000);
+
+        async function submitAnswer(pts, qIdx, data) {
+            // أضف هذا السطر في بداية الدالة:
+await new Promise(resolve => setTimeout(resolve, 1000)); // تأخير 1000 ملي ثانية (1 ثانية)
+            const players = [...data.players];
+            const idx = players.findIndex(p => p.uid === user.uid);
+            if (players[idx].answeredQ === qIdx) return; // منع الإجابة المكررة
+
+            players[idx].score += pts;
+            players[idx].answeredQ = qIdx;
+
+            await updateDoc(doc(db, "rooms", roomId), { players: players });
+        }
+
+        async function processRoundEnd(data) {
+            await updateDoc(doc(db, "rooms", roomId), { status: "finished", finishedAt: Date.now() });
+        }
+
+        async function showWinner(data) {
+            const totalPool = data.maxPlayers * data.fee;
+            const netPool = totalPool * 0.90;
+            const commission = totalPool * 0.10;
+            const sorted = [...data.players].sort((a,b) => b.score - a.score);
+            const prizes = calculatePrizes(data.maxPlayers, netPool);
+
+            // تحديث عدد مرات الفوز للفائز الأول
+            if (sorted[0].uid === user.uid) {
+                await updateDoc(doc(db, "users", user.uid), { wins: increment(1) });
+            }
+
+            // إرسال العمولة مباشرة لصاحب البريد hsn5@H.com
+            await updateAdminGems(commission);
+
+            let html = `<div class="setup-card"><h2>نتائج البطولة النهائية</h2>`;
+            sorted.forEach((p, i) => {
+                const prize = prizes[i] || 0;
+                html += `<p>${i+1}. ${p.name} - ${p.score} نقطة ${prize > 0 ? '(الفوز: '+Math.floor(prize)+' 💎)' : ''}</p>`;
+                if (prize > 0 && p.uid === sorted[0].uid) updateUserGems(p.uid, prize);
+            });
+            html += `<button class="btn-main" onclick="location.reload()">العودة للرئيسية</button></div>`;
+            document.getElementById('gameArena').innerHTML = html;
+        }
+
+        function calculatePrizes(count, amount) {
+            if (count == 2) return [amount];
+            if (count == 16) return [amount*0.4, amount*0.3, amount*0.2, amount*0.1];
+            return [amount];
+        }
+
+        async function updateUserGems(uid, amount) {
+            await updateDoc(doc(db, "users", uid), { gems: increment(Math.floor(amount)) });
+        }
+
+        async function updateAdminGems(amount) {
+            const q = query(collection(db, "users"), where("email", "==", ADMIN_EMAIL));
+            const snap = await getDocs(q);
+            if (!snap.empty) {
+                await updateDoc(doc(db, "users", snap.docs[0].id), { gems: increment(Math.floor(amount)) });
+            } else {
+                // إذا لم يوجد حساب للإدمن، ننشئه
+                try {
+                    await addDoc(collection(db, "users"), {
+                        email: ADMIN_EMAIL,
+                        name: "المشرف العام",
+                        gems: Math.floor(amount),
+                        wins: 0
+                    });
+                } catch (e) {
+                    console.log("حساب المشرف موجود بالفعل");
+                }
+            }
+        }
+
+        window.showWithdrawModal = () => {
+            if (currentRoomData.status === "active") return alert("لا يمكن الانسحاب أثناء اللعب!");
+            const refund = Math.floor(currentRoomData.fee * 0.99);
+            document.getElementById('refundAmount').textContent = refund.toLocaleString();
+            document.getElementById('withdrawModal').style.display = 'flex';
+        };
+
+        window.confirmWithdraw = async () => {
+            const refund = Math.floor(currentRoomData.fee * 0.99);
+            const adminFee = currentRoomData.fee * 0.01;
+            const newPlayers = currentRoomData.players.filter(p => p.uid !== user.uid);
+            
+            if (newPlayers.length === 0) await deleteDoc(doc(db, "rooms", roomId));
+            else await updateDoc(doc(db, "rooms", roomId), { players: newPlayers });
+
+            await updateDoc(doc(db, "users", user.uid), { gems: increment(refund) });
+            updateAdminGems(adminFee);
+            location.reload();
+        };
+
+        window.closeWithdrawModal = () => document.getElementById('withdrawModal').style.display = 'none';
+
+        window.handleAuth = async () => {
+            const e = document.getElementById('email').value, p = document.getElementById('pass').value;
+            try { 
+                await signInWithEmailAndPassword(auth, e, p); 
+                location.reload();
+            } catch(err) { alert(err.message); }
+        };
+
+        // وظيفة لعرض قائمة الأبطال
+        window.showLeaderboard = async () => {
+            document.getElementById('leaderboardModal').style.display = 'flex';
+            const q = query(collection(db, "users"), where("wins", ">", 0));
+            const snap = await getDocs(q);
+            const users = [];
+            snap.forEach(doc => {
+                users.push({ id: doc.id, ...doc.data() });
+            });
+            
+            // ترتيب المستخدمين حسب عدد مرات الفوز
+            users.sort((a, b) => b.wins - a.wins);
+            
+            const leaderboardList = document.getElementById('leaderboardList');
+            leaderboardList.innerHTML = '';
+            
+            users.forEach((user, index) => {
+                const item = document.createElement('div');
+                item.className = 'leaderboard-item';
+                item.innerHTML = `
+                    <div class="leaderboard-rank">${index + 1}</div>
+                    <img class="leaderboard-avatar" src="${user.photo || `https://ui-avatars.com/api/?name=${user.name}`}">
+                    <div class="leaderboard-info">
+                        <div class="leaderboard-name">${user.name}</div>
+                        <div class="leaderboard-stats">
+                            <div class="leaderboard-stat">
+                                <i class="fas fa-trophy trophy-icon"></i>
+                                <span>${user.wins || 0} فوز</span>
+                            </div>
+                            <div class="leaderboard-stat">
+                                <i class="fas fa-gem" style="color:var(--gold)"></i>
+                                <span>${user.gems ? user.gems.toLocaleString() : 0} جوهرة</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                leaderboardList.appendChild(item);
+            });
+        };
+
+        window.closeLeaderboard = () => document.getElementById('leaderboardModal').style.display = 'none';
+    </script>
+</body>
+</html>
