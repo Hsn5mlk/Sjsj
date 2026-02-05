@@ -3,440 +3,1021 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم مدير الكنز | Treasure Admin</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>نظام إدارة المسابقات</title>
     <style>
-        :root {
-            --primary: #34495e;
-            --accent: #3498db;
-            --danger: #e74c3c;
-            --success: #27ae60;
-            --bg-light: #f8f9fa;
-            --sidebar-width: 260px;
-        }
-
         * {
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--bg-light);
             margin: 0;
-            display: flex;
-            color: #333;
-            overflow-x: hidden;
-        }
-
-        /* Side Menu */
-        .sidebar {
-            width: var(--sidebar-width);
-            background: #2c3e50;
-            height: 100vh;
-            color: white;
-            position: fixed;
-            right: 0;
-            top: 0;
-            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
-            z-index: 1000;
-            transition: transform 0.3s ease;
-        }
-
-        .sidebar-header {
-            padding: 25px;
-            text-align: center;
-            background: #1a252f;
-        }
-        .sidebar-header h2 {
-            margin: 0;
-            color: var(--accent);
-            font-size: 22px;
-            letter-spacing: 1px;
-        }
-
-        .sidebar menu {
-            list-style: none;
             padding: 0;
-            margin: 20px 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
-        .sidebar menu li {
-            padding: 15px 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            border-right: 4px solid transparent;
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            padding-top: 160px; 
         }
-
-        .sidebar menu li:hover, .sidebar menu li.active {
-            background: #3e5871;
-            border-right-color: var(--accent);
-            color: var(--accent);
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 20px 20px; 
         }
-
-        /* Main Content */
-        .main-content {
-            margin-right: var(--sidebar-width);
-            padding: 20px;
-            width: calc(100% - var(--sidebar-width));
-            min-height: 100vh;
+        
+        header {
+            background: linear-gradient(135deg, #2c3e50, #4a6491);
+            color: white;
+            padding: 20px 0 10px 0; 
+            border-radius: 0 0 10px 10px;
+            margin-bottom: 0; 
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            position: fixed; 
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000; 
         }
-
-        .header-bar {
+        
+        .header-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
-            background: white;
-            padding: 16px 24px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            padding: 0 20px;
+            margin-bottom: 15px; 
+        }
+        
+        h1 {
+            font-size: 24px;
+        }
+        
+        .btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            white-space: nowrap;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        
+        #searchBar {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            margin: 0 20px;
         }
 
-        .header-bar h1 { 
-            margin: 0;             font-size: 22px; 
-            color: var(--primary); 
-        }
-
-        /* Grid & Cards */
-        .grid-list {
+        .tournaments-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 20px;
-        }
-
-        .card {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            transition: transform 0.3s ease;
-            position: relative;
-            border: 1px solid #eee;
-            text-align: right;
-        }
-
-        .card:hover { 
-            transform: translateY(-4px); 
-        }
-
-        .card h4 { 
-            margin-top: 0; 
-            color: var(--primary); 
-            font-size: 18px; 
-            word-break: break-word;
+            margin-top: 20px;
         }
         
-        .card p { 
-            color: #666; 
-            font-size: 14px; 
-            line-height: 1.6; 
-            margin: 8px 0;
-            word-break: break-word;
+        .tournament-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            grid-column: 1 / -1; 
         }
-
-        .card-footer {
-            margin-top: 16px;
-            padding-top: 12px;
-            border-top: 1px solid #eee;
+        
+        .tournament-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;        }
-
-        .delete-btn {
-            background: #fff;
-            color: var(--danger);
-            border: 1px solid var(--danger);
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.3s;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .delete-btn:hover { 
-            background: var(--danger); 
-            color: white; 
-        }
-
-        /* Login Overlay */
-        #loginOverlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(44, 62, 80, 0.98);
-            z-index: 99999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-        }
-
-        .login-box {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
-        .login-box h3 { 
-            margin-bottom: 25px; 
-            color: var(--primary); 
-        }
-
-        .login-box input {
-            width: 100%;            padding: 12px;
             margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        .tournament-title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .tournament-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-edit {
+            background-color: #f39c12;
+        }
+        
+        .btn-edit:hover {
+            background-color: #e67e22;
+        }
+        
+        .btn-delete {
+            background-color: #e74c3c;
+        }
+        
+        .btn-delete:hover {
+            background-color: #c0392b;
+        }
+        
+        /* ------------------------------------------- */
+        /* تصميم شجرة البطولة (Bracket) */
+        /* ------------------------------------------- */
+
+        .tournament-bracket {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding: 10px;
             border: 1px solid #ddd;
             border-radius: 8px;
-            font-size: 16px;
-            text-align: right;
+            background-color: #fafafa;
+            overflow-x: auto; 
         }
 
-        .login-box button {
-            width: 100%;
-            padding: 12px;
-            background: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
+        .bracket-structure {
+            display: flex;
+            gap: 5px; 
+            align-items: flex-start;
+            min-width: 750px; 
+            padding-bottom: 5px;
+            width: 100%; 
+        }
+        
+        .group-stage-column {
+            display: flex;
+            flex-direction: column;
+            gap: 3px; 
+            flex-shrink: 0;
+            width: 100px; 
+            padding-left: 3px;
+            border-left: 1px dashed #95a5a6;
+        }
+
+        .group-stage-title {
             font-weight: bold;
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 3px;
+            font-size: 10px; 
+        }
+        
+        .group {
+            background-color: #ecf0f1;
+            border: 1px solid #bdc3c7;
+            border-radius: 3px;
+            padding: 1px; 
+            text-align: right;
+            font-size: 9px; 
+            margin-bottom: 10px; 
+        }
+        
+        .group-title {
+            font-weight: bold;
+            margin-bottom: 1px;
+            color: #34495e;
+            font-size: 10px;
+            text-align: center;
+        }
+        
+        .player {
+            padding: 1px 0;
+            border-bottom: 1px dotted #ccc;
+            white-space: nowrap;
+        }
+
+        .player-icon {
+            margin-left: 3px;
+            color: #27ae60; 
+        }
+
+        .knockout-stage-column {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            flex-shrink: 0;
+            padding: 0; 
+            border-left: 1px dashed #95a5a6;
+            gap: 0; 
+            min-height: 500px; 
+        }
+        
+        .qualified-stage {
+            gap: 0px; 
+            width: 100px;
+            padding-top: 10px; 
+        }
+
+        .match-container {
+            display: flex;
+            align-items: center;
+            gap: 2px; 
+        }
+
+        .btn-add-player {
+            font-size: 14px; 
+            padding: 0 3px;
+            background-color: #2ecc71; 
+        }
+        .btn-add-player:hover {
+             background-color: #27ae60;
+        }
+
+        .knockout-match-box {
+            background-color: #3498db;
+            color: white;
+            padding: 3px 5px; 
+            border-radius: 3px;
+            min-width: 80px; 
+            font-size: 9px; 
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        /* تنسيق خاص للمتأهلين الذين تم إدخال أسمائهم */
+        .qualified-player-box[data-entered="true"] {
+            background-color: #2ecc71 !important; 
+        }
+
+        .qualified-player-box {
+            background-color: #f39c12; 
+            color: white;
+            padding: 3px 5px;
+            border-radius: 3px;
+            min-width: 80px; 
+            font-size: 9px; 
+            text-align: center;
+            margin-bottom: 10px; 
+        }
+
+        .round-of-16 { margin-top: 10px; }
+        .round-of-16 .match-container { margin-bottom: 25px; } 
+        
+        .quarter-finals .match-container { margin-bottom: 60px; }
+        .semi-finals .match-container { margin-bottom: 140px; }
+
+        .final-match-box {
+            background-color: #e74c3c;
+            min-width: 35px; 
+            padding: 1px 2px; 
+            font-size: 7px; 
+            margin-top: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 25px; 
+        }
+        .final-match-box .match-players {
+            gap: 0; 
+        }
+        .final-match-box .match-players span {
+            font-size: 7px; 
+            /* لإخفاء 'غير محدد' الأولي */
+            display: none; 
+        }
+        
+        .final-match-box .cup-icon {
+            font-size: 14px; 
+            margin-top: 0px;
+            line-height: 1; 
+        }
+
+        /* ------------------------------------------- */
+        /* CSS الخاص بالنوافذ المنبثقة (Modal) */
+        /* ------------------------------------------- */
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2000; 
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            max-height: 90vh; 
+            overflow-y: auto; 
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .close {
+            font-size: 24px;
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
             font-size: 16px;
         }
-
-        .hidden { 
-            display: none !important; 
+        
+        .players-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .player-input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .btn-randomize {
+            background-color: #9b59b6;
+            margin-top: 10px;
+            width: 100%;
+        }
+        
+        .btn-submit {
+            background-color: #2ecc71;
+            width: 100%;
+            margin-top: 15px;
         }
 
-        /* Mobile Responsive */
+        #playerEntryModal .modal-content {
+            max-width: 400px;
+        }
+        
+        #playerEntryModal input[type="text"] {
+            margin-bottom: 10px;
+        }
+        
+        /* ------------------------------------------- */
+        /* تعديلات استجابة الشاشة (Media Queries) */
+        /* ------------------------------------------- */
+
         @media (max-width: 768px) {
-            .sidebar {
-                width: 70px;
-                transform: translateX(0);
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
             }
-            .sidebar h2,
-            .sidebar menu li span {
-                display: none;
+            .players-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
-            .sidebar menu li {
-                justify-content: center;
-                padding: 15px 10px;
+            .bracket-structure {
+                min-width: 650px; 
             }
-            .main-content {
-                margin-right: 70px;
-                padding: 15px;
+            body {
+                padding-top: 200px; 
             }
-            .header-bar {
-                padding: 14px 16px;
-            }
-            .grid-list {
+        }
+        
+        @media (max-width: 480px) {
+            .players-grid {
                 grid-template-columns: 1fr;
-                gap: 16px;
             }
-            .card-footer {                flex-direction: column;
-                align-items: stretch;
+            .bracket-structure {
+                min-width: 550px; 
             }
-            .delete-btn {
-                width: 100%;
-                justify-content: center;
+            h1 {
+                font-size: 20px;
             }
         }
     </style>
 </head>
 <body>
-
-    <div id="loginOverlay">
-        <div class="login-box">
-            <i class="fas fa-lock-open fa-3x" style="color: var(--accent); margin-bottom: 15px;"></i>
-            <h3>بوابة الإدارة الآمنة</h3>
-            <input type="email" id="adminEmail" placeholder="البريد الإلكتروني">
-            <input type="password" id="adminPass" placeholder="كلمة المرور">
-            <button id="loginBtn">دخول النظام</button>
-            <p id="loginError" style="color: var(--danger); font-size: 13px; margin-top: 15px;"></p>
+    <header>
+        <div class="header-content">
+            <h1>نظام إدارة المسابقات الرياضية</h1>
+            <button class="btn" id="addTournamentBtn">إضافة مسابقة جديدة</button>
+        </div>
+        <input type="text" id="searchBar" placeholder="البحث عن مسابقة باسم..." onkeyup="filterTournaments()">
+    </header>
+    
+    <div class="container">
+        <div class="tournaments-container" id="tournamentsContainer">
+            <p style="text-align: center; width: 100%; margin-top: 30px;" id="loadingMessage">جارٍ تحميل المسابقات...</p>
         </div>
     </div>
-
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h2>الكنز <i class="fas fa-gem"></i></h2>
-        </div>
-        <menu id="mainMenu">
-            <li class="active" onclick="showSection('marketSection', this)"><i class="fas fa-shopping-basket"></i> <span>إدارة السوق</span></li>
-            <li onclick="showSection('agentsSection', this)"><i class="fas fa-user-shield"></i> <span>إدارة الوكلاء</span></li>
-            <li onclick="showSection('roomsSection', this)"><i class="fas fa-headset"></i> <span>إدارة الغرف</span></li>
-            <li onclick="showSection('postsSection', this)"><i class="fas fa-stream"></i> <span>إدارة الجدار</span></li>
-            <li onclick="showSection('membersSection', this)"><i class="fas fa-users"></i> <span>إدارة الأعضاء</span></li>
-            <li onclick="handleLogout()" style="margin-top: 50px; color: #ff7675;"><i class="fas fa-power-off"></i> <span>تسجيل الخروج</span></li>
-        </menu>
-    </div>
-
-    <div class="main-content">
-        <div class="header-bar">
-            <h1 id="sectionTitle">إدارة السوق</h1>
-            <div id="adminInfo">
-                <i class="fas fa-user-circle"></i> <span id="adminDisplayName">جاري التحقق...</span>
+    
+    <div class="modal" id="tournamentModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">إضافة مسابقة جديدة</h2>
+                <span class="close" id="closeModal">&times;</span>
             </div>
+            <form id="tournamentForm">
+                <div class="form-group">
+                    <label for="tournamentName">اسم المسابقة</label>
+                    <input type="text" id="tournamentName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>أسماء اللاعبين (32 لاعب)</label>
+                    <div class="players-grid" id="playersGrid">
+                        </div>
+                    <button type="button" class="btn btn-randomize" id="randomizePlayers">توزيع عشوائي</button>
+                </div>
+                
+                <button type="submit" class="btn btn-submit" id="submitBtn">حفظ المسابقة</button>
+            </form>
         </div>
-
-        <section id="marketSection" class="admin-section">
-            <div class="grid-list" id="marketList"></div>
-        </section>
-
-        <section id="agentsSection" class="admin-section hidden">            <div class="grid-list" id="agentsList"></div>
-        </section>
-
-        <section id="roomsSection" class="admin-section hidden">
-            <div class="grid-list" id="roomsList"></div>
-        </section>
-
-        <section id="postsSection" class="admin-section hidden">
-            <div class="grid-list" id="postsList"></div>
-        </section>
-
-        <section id="membersSection" class="admin-section hidden">
-            <div class="grid-list" id="membersList"></div>
-        </section>
     </div>
-
+    
+    <div class="modal" id="playerEntryModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="entryModalTitle">إدخال المتأهل</h2>
+                <span class="close" id="closeEntryModal">&times;</span>
+            </div>
+            <form id="playerEntryForm">
+                <div class="form-group">
+                    <label for="playerEntryName">اسم المتأهل</label>
+                    <input type="text" id="playerEntryName" required>
+                </div>
+                <input type="hidden" id="currentTournamentId">
+                <input type="hidden" id="currentRoundName">
+                <input type="hidden" id="currentMatchIndex">
+                <input type="hidden" id="isFinalMatch">
+                <input type="hidden" id="isQualifiedRound">
+                
+                <button type="submit" class="btn btn-submit" id="entrySubmitBtn">إضافة المتأهل</button>
+            </form>
+        </div>
+    </div>
+    
     <script type="module">
+        // -------------------------------------------
+        // تهيئة FIREBASE - تم إضافة الوظائف المفقودة
+        // -------------------------------------------
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+        import { 
+            getFirestore, 
+            collection, 
+            getDocs, 
+            query,
+            addDoc,
+            updateDoc,
+            deleteDoc,
+            doc,
+            setDoc,
+            orderBy,
+            serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDYKCCTcurNcJslrNKqdiJCoIIK-YZArB4",
             authDomain: "sbaq-fc46f.firebaseapp.com",
             projectId: "sbaq-fc46f",
             storageBucket: "sbaq-fc46f.firebasestorage.app",
-            messagingSenderId: "1026865750415",
             appId: "1:1026865750415:web:0ee39a717bcafaa0d06bfa"
         };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-
-        // ربط الأزرار
-        document.getElementById('loginBtn').addEventListener('click', adminLogin);
-        window.handleLogout = () => signOut(auth);
         
-        async function adminLogin() {
-            const email = document.getElementById('adminEmail').value;
-            const pass = document.getElementById('adminPass').value;
-            try {
-                await signInWithEmailAndPassword(auth, email, pass);
-            } catch (e) {
-                document.getElementById('loginError').textContent = "فشل تسجيل الدخول: " + e.message;
+        // ملاحظة: تم تعديل المسار ليتوافق مع هيكلية بياناتك في الكود السابق
+        const USER_ID = "user123"; 
+        const tournamentsCollectionRef = collection(db, `users/${USER_ID}/tournaments`);
+
+        // -------------------------------------------
+        // عناصر DOM والمتغيرات
+        // -------------------------------------------
+        let tournaments = [];
+        let currentEditingId = null;
+        
+        const playerEntryModal = document.getElementById('playerEntryModal');
+        const playerEntryForm = document.getElementById('playerEntryForm');
+        const entryModalTitle = document.getElementById('entryModalTitle');
+        const playerEntryNameInput = document.getElementById('playerEntryName');
+        const closeEntryModalBtn = document.getElementById('closeEntryModal');
+        const currentTournamentIdInput = document.getElementById('currentTournamentId');
+        const currentRoundNameInput = document.getElementById('currentRoundName');
+        const currentMatchIndexInput = document.getElementById('currentMatchIndex');
+        const isFinalMatchInput = document.getElementById('isFinalMatch');
+        const isQualifiedRoundInput = document.getElementById('isQualifiedRound');
+
+        const tournamentsContainer = document.getElementById('tournamentsContainer');
+        const tournamentModal = document.getElementById('tournamentModal');
+        const tournamentForm = document.getElementById('tournamentForm');
+        const tournamentNameInput = document.getElementById('tournamentName');
+        const playersGrid = document.getElementById('playersGrid');
+        const addTournamentBtn = document.getElementById('addTournamentBtn');
+        const closeModalBtn = document.getElementById('closeModal');
+        const randomizePlayersBtn = document.getElementById('randomizePlayers');
+        const modalTitle = document.getElementById('modalTitle');
+        const submitBtn = document.getElementById('submitBtn');
+        const searchBar = document.getElementById('searchBar');
+        const loadingMessage = document.getElementById('loadingMessage');
+        
+        // -------------------------------------------
+        // وظائف إدارة اللاعبين وشجرة البطولة
+        // -------------------------------------------
+        function initializePlayerInputs() {
+            playersGrid.innerHTML = '';
+            for (let i = 0; i < 32; i++) {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'player-input';
+                input.placeholder = `اللاعب ${i+1}`;
+                input.required = true;
+                playersGrid.appendChild(input);
             }
         }
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {                document.getElementById('loginOverlay').style.display = 'none';
-                document.getElementById('adminDisplayName').textContent = user.email;
-                loadAllData();
-            } else {
-                document.getElementById('loginOverlay').style.display = 'flex';
+        
+        function randomizePlayers() {
+            const playerInputs = document.querySelectorAll('.player-input');
+            const players = Array.from(playerInputs).map(input => input.value.trim()).filter(p => p !== '');
+            
+            // إذا كانت جميع الحقول فارغة، نملأها بأرقام
+            if (players.length === 0) {
+                playerInputs.forEach((input, index) => {
+                    input.value = `اللاعب ${index + 1}`;
+                });
+                return;
             }
-        });
+            
+            for (let i = players.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [players[i], players[j]] = [players[j], players[i]];
+            }
 
-        // دالة الحذف العامة
-        window.deleteItem = async (col, id) => {
-            if(confirm("⚠️ هل أنت متأكد؟ سيتم حذف هذا العنصر نهائياً من قاعدة البيانات.")) {
+            playerInputs.forEach((input, index) => {
+                input.value = players[index] || `اللاعب ${index + 1}`;
+            });
+        }
+        
+        // دالة بناء مراحل خروج المغلوب (محدثة لقراءة النتائج)
+        function buildKnockoutStage(tournament, roundName, matchCount, roundClass, isFinal = false) {
+            let matches = '';
+            const emptyText = 'غير محدد';
+            const tournamentId = tournament.id;
+            // التأكد من وجود النتائج أو تهيئتها ككائن فارغ
+            const results = tournament.bracketResults || {}; 
+            
+            for (let i = 0; i < matchCount; i++) {
+                let matchBoxContent;
+                
+                // تحديد اسم المتأهل من النتائج المحفوظة
+                let roundKey = roundName.replace(/\s/g, ''); 
+                let playerName = isFinal ? results.finalWinner : (results[roundKey] ? results[roundKey][i] : null);
+
+                if (isFinal) {
+                    matchBoxContent = `
+                        <span class="cup-icon">🏆</span>
+                        <div class="match-players">
+                            <span style="display: none;">${emptyText}</span>
+                        </div>
+                        ${playerName ? `<span style="font-size: 7px; margin-top: 2px;">${playerName}</span>` : ''}
+                    `;
+                } else {
+                    matchBoxContent = `
+                        <span style="font-size: 8px;">${roundName} ${i + 1}</span>
+                        <div class="match-players">
+                            <span>${playerName || emptyText}</span>
+                        </div>
+                    `;
+                }
+
+                matches += `
+                    <div class="match-container" data-round="${roundKey}" data-match-id="${i}">
+                        <button class="btn-add-player" type="button" 
+                                onclick="window.openPlayerEntryModal('${tournamentId}', '${roundName}', ${i}, ${isFinal}, false)">+</button>
+                        <div class="knockout-match-box ${roundClass}">
+                            ${matchBoxContent}
+                        </div>
+                    </div>
+                `;
+            }
+
+            return `<div class="knockout-stage-column ${roundClass}">${matches}</div>`;
+        }
+        
+        // دالة بناء المتأهلين (محدثة لقراءة النتائج)
+        function buildQualifiedStage(tournament) {
+            let boxes = '';
+            const emptyText = 'متأهل';
+            const roundName = 'المتأهل';
+            const tournamentId = tournament.id;
+            const results = tournament.bracketResults || {};
+            const qualifiedResults = results.qualified || [];
+
+            for (let i = 0; i < 16; i++) {
+                const groupSeparator = (i % 2 === 1 && i < 15) ? 'margin-bottom: 15px;' : ''; 
+                const playerName = qualifiedResults[i];
+                const enteredClass = playerName ? 'data-entered="true"' : '';
+                const displayPlayerName = playerName || `${emptyText} ${Math.floor(i / 2) + 1}-${(i % 2) + 1}`;
+                
+                boxes += `
+                    <div class="match-container" style="display: flex; align-items: center; gap: 2px;">
+                        <button class="btn-add-player" type="button" 
+                                onclick="window.openPlayerEntryModal('${tournamentId}', '${roundName}', ${i}, false, true)">+</button>
+                        <div class="qualified-player-box" data-qualified-index="${i}" ${enteredClass} style="${groupSeparator}">
+                            ${displayPlayerName}
+                        </div>
+                    </div>
+                `;
+            }
+            return `<div class="knockout-stage-column qualified-stage">
+                        <div class="group-stage-title" style="font-size: 10px; margin-bottom: 10px;">المتأهلون</div>
+                        ${boxes}
+                    </div>`;
+        }
+
+        // دالة فتح نافذة إدخال المتأهل
+        window.openPlayerEntryModal = (tournamentId, roundName, matchIndex, isFinal, isQualified) => {
+            const tournament = tournaments.find(t => t.id === tournamentId);
+            
+            currentTournamentIdInput.value = tournamentId;
+            currentRoundNameInput.value = roundName;
+            currentMatchIndexInput.value = matchIndex;
+            isFinalMatchInput.value = isFinal;
+            isQualifiedRoundInput.value = isQualified;
+            playerEntryNameInput.value = '';
+
+            if (isQualified) {
+                 entryModalTitle.textContent = `إدخال متأهل (مجموعة ${Math.floor(matchIndex / 2) + 1})`;
+            } else if (isFinal) {
+                 entryModalTitle.textContent = `إدخال الفائز بالنهائي`;
+            } else {
+                 entryModalTitle.textContent = `إدخال المتأهل لـ ${roundName} - مباراة ${matchIndex + 1}`;
+            }
+
+            playerEntryModal.style.display = 'flex';
+            playerEntryNameInput.focus();
+        };
+
+        // -------------------------------------------
+        // وظائف إدارة وتخزين Firestore
+        // -------------------------------------------
+
+        async function saveTournament(name, players, id) {
+            try {
+                const existingTournament = id ? tournaments.find(t => t.id === id) : null;
+                
+                const tournamentData = {
+                    name: name,
+                    players: players,
+                    createdAt: existingTournament ? existingTournament.createdAt : serverTimestamp(),
+                    updatedAt: serverTimestamp(),
+                    bracketResults: existingTournament ? existingTournament.bracketResults || {} : {}
+                };
+
+                if (id) {
+                    // تحديث المسابقة الموجودة
+                    const docRef = doc(db, `users/${USER_ID}/tournaments`, id);
+                    await updateDoc(docRef, tournamentData);
+                    console.log("Tournament updated successfully:", id);
+                } else {
+                    // إضافة مسابقة جديدة
+                    const docRef = await addDoc(tournamentsCollectionRef, tournamentData);
+                    console.log("Tournament added successfully with ID:", docRef.id);
+                }
+                
+                return true;
+            } catch (e) {
+                console.error("Error saving tournament: ", e);
+                alert("فشل حفظ المسابقة على قاعدة البيانات. تحقق من اتصال الإنترنت.");
+                return false;
+            }
+        }
+        
+        // دالة الحفظ الرئيسية للمتأهلين (تم الإصلاح هنا)
+        async function submitPlayerEntry(e) {
+            e.preventDefault();
+            
+            const tournamentId = currentTournamentIdInput.value;
+            const roundName = currentRoundNameInput.value;
+            const matchIndex = parseInt(currentMatchIndexInput.value);
+            const isFinal = isFinalMatchInput.value === 'true';
+            const isQualified = isQualifiedRoundInput.value === 'true';
+            let playerName = playerEntryNameInput.value.trim();
+
+            if (!playerName) return alert('يرجى إدخال اسم المتأهل.');
+            
+            const tournamentCard = document.querySelector(`.tournament-card[data-id="${tournamentId}"]`);
+            
+            // 1. الحصول على المسابقة الحالية
+            const tournament = tournaments.find(t => t.id === tournamentId);
+            if (!tournament) {
+                alert('المسابقة غير موجودة');
+                return;
+            }
+            
+            // 2. تحديث البيانات المحلية
+            if (!tournament.bracketResults) tournament.bracketResults = {};
+            
+            if (isQualified) {
+                if (!tournament.bracketResults.qualified) tournament.bracketResults.qualified = new Array(16).fill(null);
+                tournament.bracketResults.qualified[matchIndex] = playerName;
+            } else if (isFinal) {
+                tournament.bracketResults.finalWinner = playerName;
+            } else {
+                const roundKey = roundName.replace(/\s/g, '');
+                const matchCount = roundKey === 'د16' ? 8 : roundKey === 'د8' ? 4 : 2;
+                
+                if (!tournament.bracketResults[roundKey]) {
+                    tournament.bracketResults[roundKey] = new Array(matchCount).fill(null);
+                }
+                tournament.bracketResults[roundKey][matchIndex] = playerName;
+            }
+            
+            // 3. تحديث Firestore
+            try {
+                const docRef = doc(db, `users/${USER_ID}/tournaments`, tournamentId);
+                await updateDoc(docRef, {
+                    bracketResults: tournament.bracketResults,
+                    updatedAt: serverTimestamp()
+                });
+                
+                console.log("Player entry saved successfully");
+                
+                // 4. تحديث الواجهة مباشرة
+                if (isQualified) {
+                    const matchBox = tournamentCard.querySelector(`.qualified-player-box[data-qualified-index="${matchIndex}"]`);
+                    if (matchBox) {
+                        matchBox.textContent = playerName;
+                        matchBox.setAttribute('data-entered', 'true');
+                    }
+                } else {
+                    const matchContainer = tournamentCard.querySelector(`[data-round="${roundName.replace(/\s/g, '')}"][data-match-id="${matchIndex}"]`);
+                    const matchBox = matchContainer ? matchContainer.querySelector('.knockout-match-box') : null;
+
+                    if (matchBox) {
+                        if (isFinal) {
+                            let winnerSpan = matchBox.querySelector('.final-match-box span:not(.cup-icon)');
+                            
+                            if (winnerSpan) {
+                                winnerSpan.textContent = playerName;
+                                winnerSpan.style.display = 'block';
+                            } else {
+                                matchBox.querySelector('.cup-icon').insertAdjacentHTML('afterend', `<span style="font-size: 7px; margin-top: 2px;">${playerName}</span>`);
+                            }
+                        } else {
+                            const playersDiv = matchBox.querySelector('.match-players');
+                            playersDiv.innerHTML = `<span>${playerName}</span>`;
+                        }
+                    }
+                }
+
+            } catch (error) {
+                console.error("Error updating bracket results:", error);
+                alert("فشل في حفظ المتأهل في قاعدة البيانات.");
+            } finally {
+                playerEntryModal.style.display = 'none';
+            }
+        }
+        
+        async function deleteTournamentFromFirestore(id) {
+            if (confirm('هل أنت متأكد من حذف هذه المسابقة؟')) {
                 try {
-                    await deleteDoc(doc(db, col, id));
-                } catch (err) {
-                    alert("خطأ في الحذف: " + err.message);
+                    await deleteDoc(doc(db, `users/${USER_ID}/tournaments`, id));
+                    await loadTournaments(); 
+                    alert('تم حذف المسابقة بنجاح');
+                } catch (e) {
+                    console.error("Error deleting tournament: ", e);
+                    alert("فشل حذف المسابقة من قاعدة البيانات.");
                 }
             }
-        };
+        }
+        
+        async function loadTournaments() {
+            loadingMessage.style.display = 'block';
+            tournaments = [];
+            
+            try {
+                const q = query(tournamentsCollectionRef, orderBy("createdAt", "desc"));
+                const querySnapshot = await getDocs(q);
+                
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    data.id = doc.id; // إضافة المعرف من Firebase
+                    data.bracketResults = data.bracketResults || {};
+                    tournaments.push(data);
+                });
+                
+                renderTournaments(searchBar.value.trim()); 
+            } catch (e) {
+                console.error("Error loading tournaments: ", e);
+                tournamentsContainer.innerHTML = '<p style="text-align: center; width: 100%; margin-top: 30px; color: red;">فشل تحميل المسابقات. يرجى التحقق من اتصال Firebase.</p>';
+            } finally {
+                loadingMessage.style.display = 'none';
+            }
+        }
+        
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const name = tournamentNameInput.value.trim();
+            const playerInputs = document.querySelectorAll('.player-input');
+            const players = Array.from(playerInputs).map(input => input.value.trim());
+            
+            // التحقق من صحة البيانات
+            if (!name) {
+                alert('يرجى إدخال اسم المسابقة');
+                return;
+            }
+            
+            const emptyPlayers = players.filter(p => !p);
+            if (emptyPlayers.length > 0) {
+                alert('يرجى ملء جميع حقول أسماء اللاعبين.');
+                return;
+            }
+            
+            submitBtn.textContent = 'جارٍ الحفظ...';
+            submitBtn.disabled = true;
 
-        // دالة إنشاء البطاقة
-        const createCard = (title, content, col, id) => `
-            <div class="card">
-                <h4>${title}</h4>
-                <p>${content}</p>
-                <div class="card-footer">
-                    <small>ID: ${id.substring(0,8)}...</small>
-                    <button class="delete-btn" onclick="deleteItem('${col}', '${id}')">
-                        <i class="fas fa-trash-alt"></i> حذف
-                    </button>
-                </div>
-            </div>`;
+            const success = await saveTournament(name, players, currentEditingId);
+            
+            if (success) {
+                tournamentModal.style.display = 'none';
+                await loadTournaments(); 
+            }
 
-        function loadAllData() {
-            // السوق
-            onSnapshot(collection(db, "products"), (snap) => {
-                const list = document.getElementById('marketList');
-                list.innerHTML = snap.empty ? "<p style='text-align:center;color:#777;'>لا يوجد منتجات حالياً</p>" : "";
-                snap.forEach(d => {
-                    const p = d.data();
-                    list.innerHTML += createCard(p.name || 'بدون اسم', `السعر: ${p.price || 'غير محدد'}`, 'products', d.id);
+            submitBtn.textContent = currentEditingId ? 'حفظ التعديلات' : 'حفظ المسابقة';
+            submitBtn.disabled = false;
+        }
+
+        function editTournament(id) {
+            const tournament = tournaments.find(t => t.id === id);
+            if (tournament) {
+                currentEditingId = id;
+                tournamentNameInput.value = tournament.name;
+                
+                initializePlayerInputs();
+                const playerInputs = document.querySelectorAll('.player-input');
+                tournament.players.forEach((player, index) => {
+                    if (playerInputs[index]) {
+                        playerInputs[index].value = player;
+                    }
+                });
+
+                modalTitle.textContent = 'تعديل المسابقة';
+                submitBtn.textContent = 'حفظ التعديلات';
+                submitBtn.disabled = false;
+                tournamentModal.style.display = 'flex';
+            }
+        }
+
+        function deleteTournament(id) {
+            deleteTournamentFromFirestore(id);
+        }
+        
+        function filterTournaments() {
+            const searchTerm = searchBar.value.trim().toLowerCase();
+            renderTournaments(searchTerm);
+        }
+
+        function renderTournaments(searchTerm = '') {
+            tournamentsContainer.innerHTML = '';
+            
+            const filteredTournaments = tournaments.filter(tournament => 
+                tournament.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+
+            if (filteredTournaments.length === 0) {
+                tournamentsContainer.innerHTML = `<p style="text-align: center; width: 100%; margin-top: 30px;">
+                    ${searchTerm ? `لا توجد مسابقات تطابق البحث: "${searchTerm}"` : 'لا توجد مسابقات حالياً. انقر على "إضافة مسابقة جديدة" لإنشاء مسابقة.'}
+                </p>`;
+                return;
+            }
+            
+            filteredTournaments.forEach(tournament => {
+                const card = document.createElement('div');
+                card.className = 'tournament-card';
+                card.setAttribute('data-id', tournament.id);
+
+                const groups = [];
+                for (let i = 0; i < 8; i++) {
+                    groups.push(tournament.players.slice(i * 4, (i + 1) * 4));
+                }
+                
+                const groupStageHTML = `
+                    <div class="group-stage-column">
+                        <div class="group-stage-title">المجموعات</div>
+                        ${groups.map((group, index) => `
+                            <div class="group">
+                                <div class="group-title">م ${String.fromCharCode(65 + index)}</div>
+                                ${group.map(player => 
+                                    `<div class="player"><span class="player-icon">⚽</span> ${player}</div>`
+                                ).join('')}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+
+                // تمرير كائن المسابقة بالكامل
+                const knockoutStageHTML = `
+                    <div class="bracket-structure">
+                        ${groupStageHTML}
+                        ${buildQualifiedStage(tournament)} 
+                        ${buildKnockoutStage(tournament, 'د16', 8, 'round-of-16')}
+                        ${buildKnockoutStage(tournament, 'د8', 4, 'quarter-finals')}
+                        ${buildKnockoutStage(tournament, 'د4', 2, 'semi-finals')}
+                        ${buildKnockoutStage(tournament, 'النهائي', 1, 'final-match-box', true)}
+                    </div>
+                `;
+
+                card.innerHTML = `
+                    <div class="tournament-header">
+                        <div class="tournament-title">${tournament.name}</div>
+                        <div class="tournament-actions">
+                            <button class="btn btn-edit" data-id="${tournament.id}">تعديل</button>
+                            <button class="btn btn-delete" data-id="${tournament.id}">حذف</button>
+                        </div>
+                    </div>
+                    <div class="tournament-bracket">
+                        ${knockoutStageHTML}
+                    </div>
+                `;
+                
+                tournamentsContainer.appendChild(card);
+            });
+            
+            document.querySelectorAll('.btn-edit').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = e.target.getAttribute('data-id');
+                    editTournament(id);
                 });
             });
-
-            // الوكلاء
-            onSnapshot(collection(db, "agents"), (snap) => {
-                const list = document.getElementById('agentsList');
-                list.innerHTML = snap.empty ? "<p style='text-align:center;color:#777;'>لا يوجد وكلاء</p>" : "";
-                snap.forEach(d => {
-                    const a = d.data();
-                    list.innerHTML += createCard(a.name || 'وكلاء غير معروف', a.desc || 'لا يوجد وصف', 'agents', d.id);                });
-            });
-
-            // الغرف
-            onSnapshot(collection(db, "rooms"), (snap) => {
-                const list = document.getElementById('roomsList');
-                list.innerHTML = snap.empty ? "<p style='text-align:center;color:#777;'>لا توجد غرف</p>" : "";
-                snap.forEach(d => {
-                    const r = d.data();
-                    list.innerHTML += createCard(`غرفة: ${r.name || 'بدون اسم'}`, `المالك: ${r.ownerName || 'غير معروف'}`, 'rooms', d.id);
-                });
-            });
-
-            // الجدار
-            onSnapshot(collection(db, "posts"), (snap) => {
-                const list = document.getElementById('postsList');
-                list.innerHTML = snap.empty ? "<p style='text-align:center;color:#777;'>الجدار فارغ</p>" : "";
-                snap.forEach(d => {
-                    const p = d.data();
-                    const text = p.text || p.content || 'محتوى فارغ';
-                    const author = p.userName || 'مجهول';
-                    list.innerHTML += createCard(`كاتب: ${author}`, text, 'posts', d.id);
-                });
-            });
-
-            // الأعضاء (المستخدمين)
-            onSnapshot(collection(db, "users"), (snap) => {
-                const list = document.getElementById('membersList');
-                list.innerHTML = snap.empty ? "<p style='text-align:center;color:#777;'>لا يوجد أعضاء</p>" : "";
-                snap.forEach(d => {
-                    const u = d.data();
-                    const displayName = u.name || u.displayName || u.email || 'عضو بدون اسم';
-                    const email = u.email ? `البريد: ${u.email}` : 'لا يوجد بريد';
-                    list.innerHTML += createCard(displayName, email, 'users', d.id);
+            
+            document.querySelectorAll('.btn-delete').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = e.target.getAttribute('data-id');
+                    deleteTournament(id);
                 });
             });
         }
+        
+        // -------------------------------------------
+        // مستمعي الأحداث والتهيئة
+        // -------------------------------------------
+        
+        addTournamentBtn.addEventListener('click', () => {
+            currentEditingId = null;
+            tournamentNameInput.value = '';
+            initializePlayerInputs();
+            modalTitle.textContent = 'إضافة مسابقة جديدة';
+            submitBtn.textContent = 'حفظ المسابقة';
+            submitBtn.disabled = false;
+            tournamentModal.style.display = 'flex';
+        });
+        
+        closeModalBtn.addEventListener('click', () => {
+            tournamentModal.style.display = 'none';
+        });
 
-        // التبديل بين الأقسام
-        window.showSection = (id, el) => {
-            document.querySelectorAll('.admin-section').forEach(s => s.classList.add('hidden'));
-            document.querySelectorAll('#mainMenu li').forEach(li => li.classList.remove('active'));
-            
-            document.getElementById(id).classList.remove('hidden');
-            el.classList.add('active');
-            document.getElementById('sectionTitle').textContent = el.querySelector('span').textContent;
-        };
-
+        closeEntryModalBtn.addEventListener('click', () => {
+            playerEntryModal.style.display = 'none';
+        });
+        
+        randomizePlayersBtn.addEventListener('click', randomizePlayers);
+        tournamentForm.addEventListener('submit', handleFormSubmit);
+        playerEntryForm.addEventListener('submit', submitPlayerEntry);
+        searchBar.addEventListener('keyup', filterTournaments);
+        
+        window.addEventListener('click', (e) => {
+            if (e.target === tournamentModal) {
+                tournamentModal.style.display = 'none';
+            }
+            if (e.target === playerEntryModal) {
+                playerEntryModal.style.display = 'none';
+            }
+        });
+        
+        initializePlayerInputs();
+        loadTournaments();
     </script>
-</body></html>
+</body>
+</html>
